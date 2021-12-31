@@ -37,7 +37,7 @@ index 74d674b2684b0db4aa6c183edc6091d53e9ee882..626bcbc6dd013260c3f8b38a1d14e7ba
  
      // CraftBukkit start
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 62a8482b73796f2c6b76c0e039cb21e799bc9416..44dc880042dc16a4146c6d3bb35a8eb7b28fd3a4 100644
+index 36590a845f9620c9bfc5341cee6d8a46b1dbf45d..bff4d5f373267be48fc06aea541560f15208ad70 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -177,21 +177,40 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
@@ -85,7 +85,7 @@ index 62a8482b73796f2c6b76c0e039cb21e799bc9416..44dc880042dc16a4146c6d3bb35a8eb7
 @@ -266,6 +285,38 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
          this.regionManagers.add(this.dataRegionManager);
          // Paper end
-         this.playerMobDistanceMap = this.level.paperConfig.perPlayerMobSpawns ? new com.destroystokyo.paper.util.PlayerMobDistanceMap() : null; // Paper
+         this.playerMobDistanceMap = new com.destroystokyo.paper.util.PlayerMobDistanceMap(); // Paper
 +        // Paper start - optimise ChunkMap#anyPlayerCloseEnoughForSpawning
 +        this.playerChunkTickRangeMap = new com.destroystokyo.paper.util.misc.PlayerAreaMap(this.pooledLinkedPlayerHashSets,
 +            (ServerPlayer player, int rangeX, int rangeZ, int currPosX, int currPosZ, int prevPosX, int prevPosZ,
@@ -121,7 +121,7 @@ index 62a8482b73796f2c6b76c0e039cb21e799bc9416..44dc880042dc16a4146c6d3bb35a8eb7
      }
  
      protected ChunkGenerator generator() {
-@@ -466,6 +517,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -463,6 +514,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
          } else {
              if (holder != null) {
                  holder.setTicketLevel(level);
@@ -129,7 +129,7 @@ index 62a8482b73796f2c6b76c0e039cb21e799bc9416..44dc880042dc16a4146c6d3bb35a8eb7
              }
  
              if (holder != null) {
-@@ -1310,43 +1362,48 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1307,43 +1359,48 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
          return this.anyPlayerCloseEnoughForSpawning(pos, false);
      }
  
@@ -272,7 +272,7 @@ index 8868ffcda194e8c2300181a2cdda9337dbde6284..95f195980e28bb59f43e5ca1d5e79ebe
  
      public String getDebugStatus() {
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 41d2027cd4cf8f5de7bd59283361f7f1075356cb..24d0b02264e4cced08a60f36b5c41bb350a1dc60 100644
+index 069883ef70789a462f56ce33d3531214a07702d4..33a11e201c884cd76dc6ede2b96b967eb71adfc8 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -881,6 +881,37 @@ public class ServerChunkCache extends ChunkSource {

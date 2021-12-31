@@ -7,10 +7,10 @@ Suspected case would be around the technique used in .stopRiding
 Stack will identify any causer of this and warn instead of crashing.
 
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 0583d7ee24f694fbf5138dfae9f7b8c8e4225ab3..27c304d66ecf0bb8d7b5b4343ca207880e14711b 100644
+index 4e77d0190db21c4d7badad790bab339c47d40104..c2ae8421d333049d1846252e09bc6527e21b0ab9 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1539,6 +1539,14 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1536,6 +1536,14 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
      public void addEntity(Entity entity) {
          org.spigotmc.AsyncCatcher.catchOp("entity track"); // Spigot

@@ -17,10 +17,10 @@ This allows servers with smaller worlds who do less long distance exploring to s
 wasting cpu cycles on saving/unloading/reloading chunks repeatedly.
 
 diff --git a/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java b/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java
-index 65fcdbc5c1f637f809d3033b83e5b1c807472911..d6d549df6e8920c936dd0d1b7ba828dbebc60b32 100644
+index f1158093d53c3860332baf6336de8744d2e4402e..738c167c4387c42370ad6c9f99bc37507abfc517 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java
-@@ -659,4 +659,13 @@ public class PaperWorldConfig {
+@@ -651,4 +651,13 @@ public class PaperWorldConfig {
          expMergeMaxValue = getInt("experience-merge-max-value", -1);
          log("Experience Merge Max Value: " + expMergeMaxValue);
      }

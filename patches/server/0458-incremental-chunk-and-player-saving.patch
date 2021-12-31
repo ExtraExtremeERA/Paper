@@ -24,7 +24,7 @@ index a545a882335094daa787ec5c7005939080195263..933d3ace21f5a313f1d5e4dfd86777f6
 +    }
  }
 diff --git a/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java b/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java
-index d6d549df6e8920c936dd0d1b7ba828dbebc60b32..8b4b521a84c8623665d21d0340bca7665953d20b 100644
+index 738c167c4387c42370ad6c9f99bc37507abfc517..bf59dc5c8cdfc9bf093f1e0181bd44923c7758e2 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperWorldConfig.java
 @@ -64,6 +64,21 @@ public class PaperWorldConfig {
@@ -165,7 +165,7 @@ index 626bcbc6dd013260c3f8b38a1d14e7ba35dc1e01..9e96b0465717bfa761289c255fd8d2f1
          for (int i = 0; i < this.futures.length(); ++i) {
              CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> completablefuture = (CompletableFuture) this.futures.get(i);
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 847c4705f88b999976c9a99519939eb2e71e7f1d..42814c37f558b3fc0e59ba80c2ddaba3e6596d57 100644
+index 44b461f4ea7ecaa2268caa6d4e899c365a801977..1e5e3e31acf3d8f787789a78193525b09fcb4300 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -101,6 +101,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureMana
@@ -176,7 +176,7 @@ index 847c4705f88b999976c9a99519939eb2e71e7f1d..42814c37f558b3fc0e59ba80c2ddaba3
  import org.apache.commons.lang3.mutable.MutableBoolean;
  import org.apache.commons.lang3.mutable.MutableObject;
  import org.apache.logging.log4j.LogManager;
-@@ -639,6 +640,64 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -636,6 +637,64 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
      }
  
@@ -241,7 +241,7 @@ index 847c4705f88b999976c9a99519939eb2e71e7f1d..42814c37f558b3fc0e59ba80c2ddaba3
      protected void saveAllChunks(boolean flush) {
          if (flush) {
              List<ChunkHolder> list = (List) this.visibleChunkMap.values().stream().filter(ChunkHolder::wasAccessibleSinceLastSave).peek(ChunkHolder::refreshAccessibility).collect(Collectors.toList());
-@@ -732,13 +791,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -729,13 +788,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
          }
  
          int l = 0;
@@ -256,7 +256,7 @@ index 847c4705f88b999976c9a99519939eb2e71e7f1d..42814c37f558b3fc0e59ba80c2ddaba3
  
      }
  
-@@ -776,6 +829,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -773,6 +826,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
                          this.level.unload(chunk);
                      }
@@ -264,7 +264,7 @@ index 847c4705f88b999976c9a99519939eb2e71e7f1d..42814c37f558b3fc0e59ba80c2ddaba3
  
                      this.lightEngine.updateChunkStatus(ichunkaccess.getPos());
                      this.lightEngine.tryScheduleUpdate();
-@@ -1173,6 +1227,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1170,6 +1224,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
              asyncSaveData, chunk);
  
          chunk.setUnsaved(false);
@@ -272,7 +272,7 @@ index 847c4705f88b999976c9a99519939eb2e71e7f1d..42814c37f558b3fc0e59ba80c2ddaba3
      }
      // Paper end
  
-@@ -1182,6 +1237,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1179,6 +1234,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
          if (!chunk.isUnsaved()) {
              return false;
          } else {
@@ -281,7 +281,7 @@ index 847c4705f88b999976c9a99519939eb2e71e7f1d..42814c37f558b3fc0e59ba80c2ddaba3
              ChunkPos chunkcoordintpair = chunk.getPos();
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 24d0b02264e4cced08a60f36b5c41bb350a1dc60..013c4c428b3cf3c9ad7b9b2ed8b00b410e1804a9 100644
+index 33a11e201c884cd76dc6ede2b96b967eb71adfc8..8f6f3d3f06cb663e267bbfbecf04b3811284f322 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -825,6 +825,15 @@ public class ServerChunkCache extends ChunkSource {

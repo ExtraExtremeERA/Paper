@@ -262,10 +262,10 @@ index 049eb5693dc98e1d0ec3bd88c73a41fdb2f59bff..0716aaf29f9d76240a0de4ca02daba44
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 27c304d66ecf0bb8d7b5b4343ca207880e14711b..6f851c24a67d1b3a349790b0d60f45b23ff93bc6 100644
+index c2ae8421d333049d1846252e09bc6527e21b0ab9..cc6f989b857f4e95cb2559268b47e3c75b7ab4ea 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -514,6 +514,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -511,6 +511,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
              MutableBoolean mutableboolean = new MutableBoolean();
  
              do {
