@@ -4,8 +4,6 @@ Date: Mon, 19 Aug 2019 01:27:58 +0500
 Subject: [PATCH] Replace LocalMobCapCalculator with distance map based system
 
 
-
-
 diff --git a/src/main/java/co/aikar/timings/WorldTimingsHandler.java b/src/main/java/co/aikar/timings/WorldTimingsHandler.java
 index fe79c0add4f7cb18d487c5bb9415c40c5b551ea2..8d9ddad1879e7616d980ca70de8aecacaa86db35 100644
 --- a/src/main/java/co/aikar/timings/WorldTimingsHandler.java
