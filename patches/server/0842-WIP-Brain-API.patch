@@ -4,12 +4,12 @@ Date: Mon, 29 Nov 2021 21:57:05 -0500
 Subject: [PATCH] WIP Brain API
 
 
-diff --git a/src/main/java/io/papermc/paper/entity/brain/PaperBrainHolder.java b/src/main/java/io/papermc/paper/entity/brain/PaperBrainHolder.java
+diff --git a/src/main/java/io/papermc/paper/entity/brain/PaperBrainHandler.java b/src/main/java/io/papermc/paper/entity/brain/PaperBrainHandler.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560242653db
+index 0000000000000000000000000000000000000000..da51e3b8b8072aa2a7ef8e081d1424cba11686be
 --- /dev/null
-+++ b/src/main/java/io/papermc/paper/entity/brain/PaperBrainHolder.java
-@@ -0,0 +1,309 @@
++++ b/src/main/java/io/papermc/paper/entity/brain/PaperBrainHandler.java
+@@ -0,0 +1,308 @@
 +package io.papermc.paper.entity.brain;
 +
 +import com.google.common.collect.ImmutableList;
@@ -27,13 +27,14 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +import io.papermc.paper.entity.brain.sensor.Sensor;
 +import io.papermc.paper.entity.brain.sensor.SensorKey;
 +import net.minecraft.server.level.ServerLevel;
-+import net.minecraft.world.entity.LivingEntity;
 +import net.minecraft.world.entity.ai.Brain;
 +import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 +import net.minecraft.world.entity.ai.memory.MemoryStatus;
 +import net.minecraft.world.entity.ai.sensing.SensorType;
 +import net.minecraft.world.entity.schedule.Activity;
++import org.bukkit.craftbukkit.entity.CraftLivingEntity;
 +import org.bukkit.craftbukkit.entity.memory.CraftMemoryMapper;
++import org.bukkit.entity.LivingEntity;
 +import org.bukkit.entity.memory.MemoryKey;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
@@ -51,17 +52,21 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +So although every entity "has a brain"
 +Not every entity uses it!
 + */
-+public interface PaperBrainHolder<T extends org.bukkit.entity.LivingEntity> extends BrainHolder<T> {
++public class PaperBrainHandler implements BrainManager {
 +
-+    LivingEntity getHandle();
++    public static final PaperBrainHandler INSTANCE = new PaperBrainHandler();
 +
-+    default Brain<?> getBrain() {
-+        return this.getHandle().getBrain();
++    private static Brain<?> getBrain(LivingEntity livingEntity) {
++        return ((CraftLivingEntity) livingEntity).getHandle().getBrain();
++    }
++
++    private static net.minecraft.world.entity.LivingEntity getHandle(LivingEntity livingEntity) {
++        return ((CraftLivingEntity) livingEntity).getHandle();
 +    }
 +
 +    @Override
-+    default void clearActivities() {
-+        Brain<?> brain = this.getBrain();
++    public void clearActivities(@NotNull LivingEntity livingEntity) {
++        Brain<?> brain = getBrain(livingEntity);
 +
 +        // Clear predefined core activities
 +        brain.coreActivities = new HashSet<>();
@@ -72,7 +77,7 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +        brain.availableBehaviorsByPriority.clear();
 +    }
 +
-+    private List<ActivityKey> transformActivities(Collection<Activity> activities) {
++    private static List<ActivityKey> transformActivities(Collection<Activity> activities) {
 +        List<ActivityKey> keys = new ArrayList<>(activities.size());
 +        for (Activity activity : activities) {
 +            keys.add(PaperBrainUtil.toBukkit(activity));
@@ -82,10 +87,9 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +    }
 +
 +    @Override
-+    @NotNull
-+    default Map<Integer, Collection<ActivityKey>> getPrioritizedActivities() {
++    public @NotNull Map<Integer, Collection<ActivityKey>> getPrioritizedActivities(@NotNull LivingEntity livingEntity) {
 +        Map<Integer, Collection<ActivityKey>> activities = new HashMap<>();
-+        for (var entry : this.getBrain().availableBehaviorsByPriority.entrySet()) {
++        for (var entry : getBrain(livingEntity).availableBehaviorsByPriority.entrySet()) {
 +            activities.put(entry.getKey(), transformActivities(entry.getValue().keySet()));
 +        }
 +
@@ -93,33 +97,31 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +    }
 +
 +    @Override
-+    @NotNull
-+    default Collection<ActivityKey> getActiveActivities() {
-+        return transformActivities(this.getBrain().activeActivities);
++    public @NotNull Collection<ActivityKey> getActiveActivities(@NotNull LivingEntity livingEntity) {
++        return transformActivities(getBrain(livingEntity).activeActivities);
 +    }
 +
 +    @Override
-+    @NotNull
-+    default Collection<ActivityKey> getCoreActivities() {
-+        return transformActivities(this.getBrain().coreActivities);
++    public @NotNull Collection<ActivityKey> getCoreActivities(@NotNull LivingEntity livingEntity) {
++        return transformActivities(getBrain(livingEntity).coreActivities);
 +    }
 +
-+
 +    @Override
-+    default void startActivity(ActivityKey key) {
-+        this.getBrain().setActiveActivityIfPossible(PaperBrainUtil.getHandle(key));
++    public void startActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key) {
++        getBrain(livingEntity).setActiveActivityIfPossible(PaperBrainUtil.getHandle(key));
 +    }
 +
 +    @SuppressWarnings({"rawtypes", "unchecked"})
 +    @Override
-+    default void stopActivity(ActivityKey key) {
++    public void stopActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key) {
 +        Activity activity = PaperBrainUtil.getHandle(key);
-+        Brain<?> brain = this.getBrain();
++        Brain<?> brain = getBrain(livingEntity);
 +
 +        if (brain.isActive(activity)) {
 +            brain.activeActivities.remove(activity);
 +
-+            ServerLevel level = (ServerLevel) this.getHandle().level;
++            net.minecraft.world.entity.LivingEntity handle = getHandle(livingEntity);
++            ServerLevel level = (ServerLevel) handle.level;
 +            Map<Integer, Map<Activity, Set<net.minecraft.world.entity.ai.behavior.Behavior>>> map = (Map<Integer, Map<Activity, Set<net.minecraft.world.entity.ai.behavior.Behavior>>>) brain.availableBehaviorsByPriority.values();
 +
 +            for(var behaviorsMap : map.values()) {
@@ -128,7 +130,7 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +                if (behaviors != null) {
 +                    for(var behavior : behaviors) {
 +                        if (behavior.getStatus() == net.minecraft.world.entity.ai.behavior.Behavior.Status.RUNNING) {
-+                            behavior.doStop(level, this.getHandle(), level.getGameTime());
++                            behavior.doStop(level, handle, level.getGameTime());
 +                        }
 +                    }
 +                }
@@ -138,19 +140,19 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +    }
 +
 +    @Override
-+    default void startFirstValidActivity(Collection<ActivityKey> keys) {
++    public void startFirstValidActivity(@NotNull LivingEntity livingEntity, @NotNull Collection<ActivityKey> keys) {
 +        List<Activity> activites = new ArrayList<>(keys.size());
 +        for (ActivityKey key : keys) {
 +            activites.add(PaperBrainUtil.getHandle(key));
 +        }
 +
-+        getBrain().setActiveActivityToFirstValid(activites);
++        getBrain(livingEntity).setActiveActivityToFirstValid(activites);
 +    }
 +
 +    @SuppressWarnings({"unchecked", "rawtypes"})
 +    @Override
-+    default void addActivity(ActivityKey key, Collection<BehaviorPair<? super T>> behaviorPairs, Collection<MemoryPair> requiredMemories, Collection<MemoryKey<?>> keysToRemoveOnFinish) {
-+        Brain<?> brain = this.getBrain();
++    public <T extends LivingEntity> void addActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key, @NotNull Collection<BehaviorPair<? super T>> behaviorPairs, @NotNull Collection<MemoryPair> requiredMemories, @NotNull Collection<MemoryKey<?>> keysToRemoveOnFinish) {
++        Brain<?> brain = getBrain(livingEntity);
 +
 +        ImmutableList.Builder behaviorPairList = ImmutableList.builderWithExpectedSize(behaviorPairs.size());
 +        for (BehaviorPair<? super T> pair : behaviorPairs) {
@@ -184,29 +186,29 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +    }
 +
 +    @Override
-+    default ActivityKey getDefaultActivity() {
-+        return PaperBrainUtil.toBukkit(this.getBrain().defaultActivity);
++    public @NotNull ActivityKey getDefaultActivity(@NotNull LivingEntity livingEntity) {
++        return PaperBrainUtil.toBukkit(getBrain(livingEntity).defaultActivity);
 +    }
 +
 +    @Override
-+    default void setDefaultActivity(ActivityKey key) {
-+        getBrain().setDefaultActivity(PaperBrainUtil.getHandle(key));
++    public void setDefaultActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key) {
++        getBrain(livingEntity).setDefaultActivity(PaperBrainUtil.getHandle(key));
 +    }
 +
 +    @Override
-+    default void setCoreActivities(Collection<ActivityKey> keys) {
++    public void setCoreActivities(@NotNull LivingEntity livingEntity, @NotNull Collection<ActivityKey> keys) {
 +        Set<Activity> activites = new HashSet<>(keys.size());
 +        for (ActivityKey key : keys) {
 +            activites.add(PaperBrainUtil.getHandle(key));
 +        }
 +
-+        getBrain().setCoreActivities(activites);
++        getBrain(livingEntity).setCoreActivities(activites);
 +    }
 +
 +    @SuppressWarnings({"unchecked", "rawtypes"})
 +    @Override
-+    default void addSensor(SensorKey key, Sensor<? super T> sensor) {
-+        Brain<?> brain = this.getBrain();
++    public <T extends LivingEntity> void addSensor(@NotNull LivingEntity livingEntity, @NotNull SensorKey key, Sensor<? super T> sensor) {
++        Brain<?> brain = getBrain(livingEntity);
 +
 +        // See brain constructor
 +        net.minecraft.world.entity.ai.sensing.Sensor mcSensor;
@@ -228,28 +230,27 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +    }
 +
 +    @Override
-+    default void clearSensors() {
-+        Brain<?> brain = this.getBrain();
++    public void clearSensors(@NotNull LivingEntity livingEntity) {
++        Brain<?> brain = getBrain(livingEntity);
 +        brain.sensors.clear();
 +    }
 +
 +    @Override
-+    default void removeSensor(SensorKey key) {
-+        Brain<?> brain = this.getBrain();
++    public void removeSensor(@NotNull LivingEntity livingEntity, @NotNull SensorKey key) {
++        Brain<?> brain = getBrain(livingEntity);
 +        brain.sensors.remove(PaperBrainUtil.getHandle(key));
 +    }
 +
 +    @Nullable
 +    @Override
-+    default Sensor<? extends org.bukkit.entity.LivingEntity> getSensor(SensorKey key) {
-+        Brain<?> brain = this.getBrain();
++    public Sensor<? extends LivingEntity> getSensor(@NotNull LivingEntity livingEntity, @NotNull SensorKey key) {
++        Brain<?> brain = getBrain(livingEntity);
 +        return brain.sensors.get(PaperBrainUtil.getHandle(key)).getPaperSensor();
 +    }
 +
 +    @Override
-+    @NotNull
-+    default Collection<Sensor<? extends org.bukkit.entity.LivingEntity>> getSensors() {
-+        Brain<?> brain = this.getBrain();
++    public @NotNull Collection<Sensor<? extends LivingEntity>> getSensors(@NotNull LivingEntity livingEntity) {
++        Brain<?> brain = getBrain(livingEntity);
 +
 +        List<Sensor<? extends org.bukkit.entity.LivingEntity>> sensors = new ArrayList<>(brain.sensors.size());
 +        for (net.minecraft.world.entity.ai.sensing.Sensor<?> sensor : brain.sensors.values()) {
@@ -260,15 +261,15 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +    }
 +
 +    @Override
-+    default void registerMemory(MemoryKey<?> memoryKey) {
-+        Brain<?> brain = this.getBrain();
++    public void registerMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey) {
++        Brain<?> brain = getBrain(livingEntity);
 +        brain.memories.put(PaperBrainUtil.getHandle(memoryKey), Optional.empty());
 +    }
 +
 +    @SuppressWarnings("unchecked")
 +    @Override
-+    default <V> void setMemory(MemoryKey<V> memoryKey, V value, long expireIn) {
-+        Brain<?> brain = this.getBrain();
++    public <V> void setMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<V> memoryKey, @Nullable V value, long expireIn) {
++        Brain<?> brain = getBrain(livingEntity);
 +
 +        if (memoryKey instanceof PaperMemory<V>) {
 +            brain.setMemoryWithExpiry(PaperBrainUtil.getHandle(memoryKey), value, expireIn);
@@ -279,29 +280,27 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +    }
 +
 +    @Override
-+    @NotNull
-+    default boolean isMemoryStatus(MemoryKey<?> memoryKey, MemoryKeyStatus status) {
-+        Brain<?> brain = this.getBrain();
++    public boolean memoryStatusMatches(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey, @NotNull MemoryKeyStatus status) {
++        Brain<?> brain = this.getBrain(livingEntity);
 +
 +        return brain.checkMemory(PaperBrainUtil.getHandle(memoryKey), PaperBrainUtil.getHandle(status));
 +    }
 +
 +    @Override
-+    default void forgetMemory(MemoryKey<?> memoryKey) {
-+        Brain<?> brain = this.getBrain();
++    public void forgetMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey) {
++        Brain<?> brain = getBrain(livingEntity);
 +
 +        brain.eraseMemory(PaperBrainUtil.getHandle(memoryKey));
 +    }
 +
 +    @Override
-+    default void unregisterMemory(MemoryKey<?> memoryKey) {
-+        this.getBrain().memories.remove(PaperBrainUtil.getHandle(memoryKey));
++    public void unregisterMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey) {
++        getBrain(livingEntity).memories.remove(PaperBrainUtil.getHandle(memoryKey));
 +    }
 +
 +    @Override
-+    @NotNull
-+    default Collection<MemoryKey<?>> getMemories() {
-+        Brain<?> brain = this.getBrain();
++    public @NotNull Collection<MemoryKey<?>> getMemories(@NotNull LivingEntity livingEntity) {
++        Brain<?> brain = getBrain(livingEntity);
 +
 +        List<MemoryKey<?>> memories = new ArrayList<>(); // Don't specify initial size since keys can be null due to this being a separate api
 +        for (MemoryModuleType<?> memory : brain.memories.keySet()) {
@@ -315,8 +314,8 @@ index 0000000000000000000000000000000000000000..aa17d1b5ad8045957a8c0ec3cd694560
 +    }
 +
 +    @Override
-+    default void unregisterMemories() {
-+        this.getBrain().memories.clear();
++    public void unregisterMemories(@NotNull LivingEntity livingEntity) {
++        getBrain(livingEntity).memories.clear();
 +    }
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/PaperBrainUtil.java b/src/main/java/io/papermc/paper/entity/brain/PaperBrainUtil.java
@@ -849,10 +848,10 @@ index f3b8e253a5bfc3f68121dbe656ae7e2ac0f0eb1c..33948d8387df1e422875a7edc24c3359
 +    // Paper end - mob goal api
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index b70a6d126e80d775870cfececf6724cde89d4554..15a51e0fe499e8d4bc6406485734ffb3a13748f1 100644
+index ba7023e7ca5d29375ff53c2951892138d155f69f..faa0a826f7fd909b99e4d4f35dda858cc05d889f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -2794,5 +2794,20 @@ public final class CraftServer implements Server {
+@@ -2815,5 +2815,24 @@ public final class CraftServer implements Server {
          return datapackManager;
      }
  
@@ -871,28 +870,17 @@ index b70a6d126e80d775870cfececf6724cde89d4554..15a51e0fe499e8d4bc6406485734ffb3
 +        return new io.papermc.paper.entity.brain.memory.PaperMemory<>(key);
 +    }
 +
++    @Override
++    public io.papermc.paper.entity.brain.BrainManager getBrainManager() {
++        return io.papermc.paper.entity.brain.PaperBrainHandler.INSTANCE;
++    }
      // Paper end
  }
-diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftAxolotl.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftAxolotl.java
-index cd751a13a29c34be1d084253f19bf2dce8399d01..1f37eeca4778bfa85c96ceef96a7cbfb6607a5f1 100644
---- a/src/main/java/org/bukkit/craftbukkit/entity/CraftAxolotl.java
-+++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftAxolotl.java
-@@ -4,8 +4,9 @@ import com.google.common.base.Preconditions;
- import org.bukkit.craftbukkit.CraftServer;
- import org.bukkit.entity.Axolotl;
- import org.bukkit.entity.EntityType;
-+import org.bukkit.entity.Zoglin;
- 
--public class CraftAxolotl extends CraftAnimals implements Axolotl {
-+public class CraftAxolotl extends CraftAnimals implements Axolotl, io.papermc.paper.entity.brain.PaperBrainHolder<Axolotl> {
- 
-     public CraftAxolotl(CraftServer server, net.minecraft.world.entity.animal.axolotl.Axolotl entity) {
-         super(server, entity);
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftGoat.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftGoat.java
-index 436aa41563b8fab112d03c8cc516cf6ff37587bd..5a120c8096e6fb8afa7b7076b732ba7a785e8dc5 100644
+index 436aa41563b8fab112d03c8cc516cf6ff37587bd..91d0d78453f4679c691493131b5da6b5dded1a24 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftGoat.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftGoat.java
-@@ -1,10 +1,11 @@
+@@ -1,6 +1,7 @@
  package org.bukkit.craftbukkit.entity;
  
  import org.bukkit.craftbukkit.CraftServer;
@@ -900,27 +888,18 @@ index 436aa41563b8fab112d03c8cc516cf6ff37587bd..5a120c8096e6fb8afa7b7076b732ba7a
  import org.bukkit.entity.EntityType;
  import org.bukkit.entity.Goat;
  
--public class CraftGoat extends CraftAnimals implements Goat {
-+public class CraftGoat extends CraftAnimals implements Goat, io.papermc.paper.entity.brain.PaperBrainHolder<Goat> {
- 
-     public CraftGoat(CraftServer server, net.minecraft.world.entity.animal.goat.Goat entity) {
-         super(server, entity);
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftHoglin.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftHoglin.java
-index d5b31e4051f22fee4b91eb0e6be25d72e0471eff..ec2470ea97755ff637126f4dbb54e9cc63756f76 100644
+index d5b31e4051f22fee4b91eb0e6be25d72e0471eff..49a22a20229ac6e4c4ebaf825814c3c384b3f35b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftHoglin.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftHoglin.java
-@@ -3,9 +3,10 @@ package org.bukkit.craftbukkit.entity;
+@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.entity;
  import com.google.common.base.Preconditions;
  import org.bukkit.craftbukkit.CraftServer;
  import org.bukkit.entity.EntityType;
 +import org.bukkit.entity.Goat;
  import org.bukkit.entity.Hoglin;
  
--public class CraftHoglin extends CraftAnimals implements Hoglin {
-+public class CraftHoglin extends CraftAnimals implements Hoglin, io.papermc.paper.entity.brain.PaperBrainHolder<Hoglin> {
- 
-     public CraftHoglin(CraftServer server, net.minecraft.world.entity.monster.hoglin.Hoglin entity) {
-         super(server, entity);
+ public class CraftHoglin extends CraftAnimals implements Hoglin {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
 index c022751e3b45469cc0ad6732e2d6ff08918bafa4..11983dff8a3cfcbdd8ffb164366f1ebcfafdb2fe 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
@@ -947,10 +926,10 @@ index c022751e3b45469cc0ad6732e2d6ff08918bafa4..11983dff8a3cfcbdd8ffb164366f1ebc
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglin.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglin.java
-index aeda5fc001fe4ce55ee467240b275b6050a29f98..bc718739ee2f9e3df2617515b3ed70eca59feffd 100644
+index aeda5fc001fe4ce55ee467240b275b6050a29f98..257637b7fbdf80427343629d12ad74076d18dc92 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglin.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglin.java
-@@ -10,10 +10,11 @@ import org.bukkit.craftbukkit.CraftServer;
+@@ -10,11 +10,11 @@ import org.bukkit.craftbukkit.CraftServer;
  import org.bukkit.craftbukkit.inventory.CraftInventory;
  import org.bukkit.craftbukkit.util.CraftMagicNumbers;
  import org.bukkit.entity.EntityType;
@@ -959,49 +938,83 @@ index aeda5fc001fe4ce55ee467240b275b6050a29f98..bc718739ee2f9e3df2617515b3ed70ec
  import org.bukkit.inventory.Inventory;
  
 -public class CraftPiglin extends CraftPiglinAbstract implements Piglin, com.destroystokyo.paper.entity.CraftRangedEntity<net.minecraft.world.entity.monster.piglin.Piglin> { // Paper
-+public class CraftPiglin extends CraftPiglinAbstract implements Piglin, com.destroystokyo.paper.entity.CraftRangedEntity<net.minecraft.world.entity.monster.piglin.Piglin>, io.papermc.paper.entity.brain.PaperBrainHolder<Piglin> { // Paper
- 
+-
++public class CraftPiglin extends CraftPiglinAbstract implements Piglin, com.destroystokyo.paper.entity.CraftRangedEntity<net.minecraft.world.entity.monster.piglin.Piglin> {
      public CraftPiglin(CraftServer server, net.minecraft.world.entity.monster.piglin.Piglin entity) {
          super(server, entity);
-diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglinBrute.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglinBrute.java
-index 689c4ce62f604d023e2f293db17f423fd10acbaf..ac6a0ec993560436a25b9f7a9f709b12ac71b6d2 100644
---- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglinBrute.java
-+++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglinBrute.java
-@@ -4,7 +4,7 @@ import org.bukkit.craftbukkit.CraftServer;
- import org.bukkit.entity.EntityType;
- import org.bukkit.entity.PiglinBrute;
- 
--public class CraftPiglinBrute extends CraftPiglinAbstract implements PiglinBrute {
-+public class CraftPiglinBrute extends CraftPiglinAbstract implements PiglinBrute, io.papermc.paper.entity.brain.PaperBrainHolder<PiglinBrute> {
- 
-     public CraftPiglinBrute(CraftServer server, net.minecraft.world.entity.monster.piglin.PiglinBrute entity) {
-         super(server, entity);
-diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
-index dbc1ea96223675fbe03585598a9c7f51acc61d2e..a76f1028f261f61e5b75b8d1a7e1e7c9e70075ec 100644
---- a/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
-+++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
-@@ -23,7 +23,7 @@ import java.util.Map;
- import java.util.UUID;
- // Paper end
- 
--public class CraftVillager extends CraftAbstractVillager implements Villager {
-+public class CraftVillager extends CraftAbstractVillager implements Villager, io.papermc.paper.entity.brain.PaperBrainHolder<Villager> {
- 
-     public CraftVillager(CraftServer server, net.minecraft.world.entity.npc.Villager entity) {
-         super(server, entity);
+     }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftZoglin.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftZoglin.java
-index 611e794d86ff63d725de9bb843802ec868f4b1fd..f5e64a0e5fa9d076c8790e7cec64fddc96f0989b 100644
+index 611e794d86ff63d725de9bb843802ec868f4b1fd..eb15a997fa855f90bab7eb159ac2342f77578e94 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftZoglin.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftZoglin.java
-@@ -2,9 +2,10 @@ package org.bukkit.craftbukkit.entity;
+@@ -2,6 +2,7 @@ package org.bukkit.craftbukkit.entity;
  
  import org.bukkit.craftbukkit.CraftServer;
  import org.bukkit.entity.EntityType;
 +import org.bukkit.entity.Villager;
  import org.bukkit.entity.Zoglin;
  
--public class CraftZoglin extends CraftMonster implements Zoglin {
-+public class CraftZoglin extends CraftMonster implements Zoglin, io.papermc.paper.entity.brain.PaperBrainHolder<Zoglin> {
- 
-     public CraftZoglin(CraftServer server, net.minecraft.world.entity.monster.Zoglin entity) {
-         super(server, entity);
+ public class CraftZoglin extends CraftMonster implements Zoglin {
+diff --git a/src/test/java/io/papermc/paper/entity/brain/MissingBrainAPITest.java b/src/test/java/io/papermc/paper/entity/brain/MissingBrainAPITest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..99e68796afbd0b121adb55bb1a7580b3252f2ef3
+--- /dev/null
++++ b/src/test/java/io/papermc/paper/entity/brain/MissingBrainAPITest.java
+@@ -0,0 +1,57 @@
++package io.papermc.paper.entity.brain;
++
++import com.google.common.base.Joiner;
++import io.papermc.paper.entity.brain.activity.ActivityKey;
++import io.papermc.paper.entity.brain.activity.VanillaActivityKey;
++import io.papermc.paper.entity.brain.sensor.SensorKey;
++import io.papermc.paper.entity.brain.sensor.VanillaSensorKey;
++import net.minecraft.core.Registry;
++import net.minecraft.resources.ResourceLocation;
++import org.bukkit.NamespacedKey;
++import org.bukkit.craftbukkit.util.CraftNamespacedKey;
++import org.junit.Test;
++
++import java.lang.reflect.Field;
++import java.util.HashSet;
++import java.util.Set;
++
++import static org.junit.Assert.assertTrue;
++
++public class MissingBrainAPITest {
++
++    @Test
++    public void missingActivities() throws IllegalAccessException {
++        Set<NamespacedKey> activities = new HashSet<>();
++        for (ResourceLocation minecraftRegistered : Registry.ACTIVITY.keySet()) {
++            activities.add(CraftNamespacedKey.fromMinecraft(minecraftRegistered));
++        }
++
++        for (Field field : VanillaActivityKey.class.getDeclaredFields()) {
++            if (field.getType() == ActivityKey.class) {
++                activities.remove(((ActivityKey) field.get(null)).getKey());
++            }
++        }
++
++
++        assertTrue(ActivityKey.class.getName() + " instance(s): " + Joiner.on(", ").join(activities) + " do not have bukkit equivalents", activities.size() == 0);
++    }
++
++    @Test
++    public void missingSensors() throws IllegalAccessException {
++        Set<NamespacedKey> sensors = new HashSet<>();
++        for (ResourceLocation minecraftRegistered : Registry.SENSOR_TYPE.keySet()) {
++            sensors.add(CraftNamespacedKey.fromMinecraft(minecraftRegistered));
++        }
++        sensors.remove(NamespacedKey.minecraft("dummy"));
++
++        for (Field field : VanillaSensorKey.class.getDeclaredFields()) {
++            if (field.getType() == SensorKey.class) {
++                sensors.remove(((SensorKey) field.get(null)).getKey());
++            }
++        }
++
++
++        assertTrue(SensorKey.class.getName() + " instance(s): " + Joiner.on(", ").join(sensors) + " do not have bukkit equivalents", sensors.size() == 0);
++    }
++
++}
