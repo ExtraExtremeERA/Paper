@@ -1,5 +1,6 @@
 package io.papermc.paper.testplugin;
 
+import io.papermc.paper.entity.brain.BrainManager;
 import io.papermc.paper.entity.brain.activity.VanillaActivityKey;
 import io.papermc.paper.entity.brain.sensor.SensorKey;
 import io.papermc.paper.testplugin.behaviors.ClosestParrotSensor;
@@ -41,36 +42,36 @@ public final class TestPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onInteractEntity(PlayerInteractEntityEvent event) {
         if (event.getRightClicked() instanceof Goat brainHolder) {
-
+            BrainManager manager = Bukkit.getBrainManager();
             System.out.println("Activities: ");
-            for (var activities : brainHolder.getPrioritizedActivities().entrySet()) {
+            for (var activities : manager.getPrioritizedActivities(brainHolder).entrySet()) {
                 debug("Priority: " + activities.getKey(), activities.getValue());
             }
-            debug("Core Activities", brainHolder.getCoreActivities());
-            debug("Active Activities", brainHolder.getActiveActivities());
-            System.out.println("Sensors: " + brainHolder.getSensors());
-            debug("Memories", brainHolder.getMemories());
+            debug("Core Activities", manager.getCoreActivities(brainHolder));
+            debug("Active Activities", manager.getActiveActivities(brainHolder));
+            System.out.println("Sensors: " + manager.getSensors(brainHolder));
+            debug("Memories", manager.getMemories(brainHolder));
 
             if (event.getPlayer().isSneaking()) {
                 return;
             }
 
             // Clear vanilla stuff
-            brainHolder.clearActivities();
-            brainHolder.unregisterMemories();
-            brainHolder.clearSensors();
+            manager.clearActivities(brainHolder);
+            manager.unregisterMemories(brainHolder);
+            manager.clearSensors(brainHolder);
 
-            brainHolder.registerMemory(SQUID_CANDIDATES); // Register the custom memory
-            brainHolder.registerMemory(SQUID_RAGE);
+            manager.registerMemory(brainHolder, SQUID_CANDIDATES); // Register the custom memory
+            manager.registerMemory(brainHolder, SQUID_RAGE);
 
-            brainHolder.addActivity(VanillaActivityKey.IDLE, 1, List.of(new HuntSquidsBehavior(), new SpinBehavior()));
-            brainHolder.addActivity(VanillaActivityKey.CORE, 1, List.of(new SniffSquidsBehavior(), new ScreamAtParrotsBehavior()));
+            manager.addActivity(brainHolder, VanillaActivityKey.IDLE, 1, List.of(new HuntSquidsBehavior(), new SpinBehavior()));
+            manager.addActivity(brainHolder, VanillaActivityKey.CORE, 1, List.of(new SniffSquidsBehavior(), new ScreamAtParrotsBehavior()));
 
-            brainHolder.addSensor(SNIFF_SQUID_SENSOR, new ClosestSquidsSensor()); // Add the scary mob finder sensor
-            brainHolder.addSensor(PARROT_SENSOR, new ClosestParrotSensor());
+            manager.addSensor(brainHolder, SNIFF_SQUID_SENSOR, new ClosestSquidsSensor()); // Add the scary mob finder sensor
+            manager.addSensor(brainHolder, PARROT_SENSOR, new ClosestParrotSensor());
 
-            brainHolder.setDefaultActivity(VanillaActivityKey.IDLE); // If no activities at this moment can activate, it goes to default.
-            brainHolder.setCoreActivities(List.of(VanillaActivityKey.CORE)); // This activity is ALWAYS active during other activities
+            manager.setDefaultActivity(brainHolder, VanillaActivityKey.IDLE); // If no activities at this moment can activate, it goes to default.
+            manager.setCoreActivities(brainHolder, List.of(VanillaActivityKey.CORE)); // This activity is ALWAYS active during other activities
         }
 
     }

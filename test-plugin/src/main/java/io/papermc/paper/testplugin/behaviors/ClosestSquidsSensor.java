@@ -1,8 +1,9 @@
 package io.papermc.paper.testplugin.behaviors;
 
-import io.papermc.paper.entity.brain.BrainHolder;
+import io.papermc.paper.entity.brain.BrainManager;
 import io.papermc.paper.entity.brain.sensor.Sensor;
 import io.papermc.paper.testplugin.TestPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Squid;
 import org.bukkit.entity.memory.MemoryKey;
@@ -11,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public class ClosestSquidsSensor implements Sensor<LivingEntity> {
 
@@ -28,16 +28,15 @@ public class ClosestSquidsSensor implements Sensor<LivingEntity> {
             .map((squid) -> ((Squid) squid))
             .toList();
 
-        var brainHolder = ((BrainHolder<?>) entity);
-
+        BrainManager brainManager = Bukkit.getBrainManager();
         if (!squids.isEmpty()) {
-            brainHolder.setMemory(TestPlugin.SQUID_CANDIDATES, new ArrayList<>(squids), Long.MAX_VALUE);
+            brainManager.setMemory(entity, TestPlugin.SQUID_CANDIDATES, new ArrayList<>(squids), Long.MAX_VALUE);
         } else {
-            brainHolder.forgetMemory(TestPlugin.SQUID_CANDIDATES);
+            brainManager.forgetMemory(entity, TestPlugin.SQUID_CANDIDATES);
         }
 
         if (squids.size() == 3) { // Once 3 squids are found
-            brainHolder.setMemory(TestPlugin.SQUID_RAGE, true, 200); // angry for 10 secs
+            brainManager.setMemory(entity, TestPlugin.SQUID_RAGE, true, 200); // angry for 10 secs
         }
     }
 
