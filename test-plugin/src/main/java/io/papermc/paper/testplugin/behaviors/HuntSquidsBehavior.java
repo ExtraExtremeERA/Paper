@@ -24,7 +24,8 @@ public class HuntSquidsBehavior implements Behavior<Mob> {
 
     @Override
     public void tick(Mob entity) {
-        List<Squid> squids = entity.getMemory(TestPlugin.SQUID_CANDIDATES);
+        List<Squid> squids = Bukkit.getMemoryManager().getMemory(entity, TestPlugin.SQUID_CANDIDATES).orElse(null);
+
         if (target == null || target.isDead()) {
             BrainManager manager = Bukkit.getBrainManager();
             if (squids.isEmpty()) {
@@ -52,7 +53,7 @@ public class HuntSquidsBehavior implements Behavior<Mob> {
 
     @Override
     public boolean canStillRun(Mob entity) {
-        return entity.getMemory(TestPlugin.SQUID_RAGE) != null && entity.getMemory(TestPlugin.SQUID_CANDIDATES) != null && !entity.getMemory(TestPlugin.SQUID_CANDIDATES).isEmpty();
+        return Bukkit.getMemoryManager().getMemory(entity, TestPlugin.SQUID_RAGE).isPresent() && Bukkit.getMemoryManager().getMemory(entity, TestPlugin.SQUID_CANDIDATES).isPresent() && Bukkit.getMemoryManager().getMemory(entity, TestPlugin.SQUID_CANDIDATES).isEmpty();
     }
 
     @Override

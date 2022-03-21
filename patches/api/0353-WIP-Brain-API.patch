@@ -4,18 +4,282 @@ Date: Mon, 29 Nov 2021 21:57:09 -0500
 Subject: [PATCH] WIP Brain API
 
 
+diff --git a/src/main/java/co/aikar/timings/TimingIdentifier.java b/src/main/java/co/aikar/timings/TimingIdentifier.java
+index df142a89b8c43acb81eb383eac0ef048a1f49a6e..22e9be50ff8e15f3589186b87c0b3c3b9aecbd2d 100644
+--- a/src/main/java/co/aikar/timings/TimingIdentifier.java
++++ b/src/main/java/co/aikar/timings/TimingIdentifier.java
+@@ -36,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+ /**
+- * <p>Used as a basis for fast HashMap key comparisons for the Timing Map.</p>
++ * <p>Used as a basis for fast HashMap memory comparisons for the Timing Map.</p>
+  *
+  * This class uses interned strings giving us the ability to do an identity check instead of equals() on the strings
+  */
+diff --git a/src/main/java/co/aikar/util/JSONUtil.java b/src/main/java/co/aikar/util/JSONUtil.java
+index 190bf0598442c89c2a1c93ad7c8c1a29797304ae..65fbd61402ab87355abae134c0fe61efd29c0378 100644
+--- a/src/main/java/co/aikar/util/JSONUtil.java
++++ b/src/main/java/co/aikar/util/JSONUtil.java
+@@ -21,7 +21,7 @@ public final class JSONUtil {
+     private JSONUtil() {}
+ 
+     /**
+-     * Creates a key/value "JSONPair" object
++     * Creates a memory/value "JSONPair" object
+      *
+      * @param key Key to use
+      * @param obj Value to use
+@@ -38,7 +38,7 @@ public final class JSONUtil {
+     }
+ 
+     /**
+-     * Creates a new JSON object from multiple JSONPair key/value pairs
++     * Creates a new JSON object from multiple JSONPair memory/value pairs
+      *
+      * @param data JSONPairs
+      * @return Map
+@@ -49,7 +49,7 @@ public final class JSONUtil {
+     }
+ 
+     /**
+-     * This appends multiple key/value Obj pairs into a JSON Object
++     * This appends multiple memory/value Obj pairs into a JSON Object
+      *
+      * @param parent Map to be appended to
+      * @param data Data to append
+@@ -125,7 +125,7 @@ public final class JSONUtil {
+     }
+ 
+     /**
+-     * Simply stores a key and a value, used internally by many methods below.
++     * Simply stores a memory and a value, used internally by many methods below.
+      */
+     @SuppressWarnings("PublicInnerClass")
+     public static class JSONPair {
+diff --git a/src/main/java/co/aikar/util/LoadingIntMap.java b/src/main/java/co/aikar/util/LoadingIntMap.java
+index 63a899c7dbdb69daa4876a2ce2a7dfb734b5af9d..951a938878dd2cb9ce467aa265380f227703b420 100644
+--- a/src/main/java/co/aikar/util/LoadingIntMap.java
++++ b/src/main/java/co/aikar/util/LoadingIntMap.java
+@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+ /**
+- * Allows you to pass a Loader function that when a key is accessed that doesn't exist,
++ * Allows you to pass a Loader function that when a memory is accessed that doesn't exist,
+  * automatically loads the entry into the map by calling the loader Function.
+  *
+  * .get() Will only return null if the Loader can return null.
+diff --git a/src/main/java/co/aikar/util/LoadingMap.java b/src/main/java/co/aikar/util/LoadingMap.java
+index aedbb03321886cb267879d7994653e447b485f6a..58569ff915a47990e9dd7d93cce9506926eed55b 100644
+--- a/src/main/java/co/aikar/util/LoadingMap.java
++++ b/src/main/java/co/aikar/util/LoadingMap.java
+@@ -36,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+ /**
+- * Allows you to pass a Loader function that when a key is accessed that doesn't exists,
++ * Allows you to pass a Loader function that when a memory is accessed that doesn't exists,
+  * automatically loads the entry into the map by calling the loader Function.
+  *
+  * .get() Will only return null if the Loader can return null.
+diff --git a/src/main/java/com/destroystokyo/paper/ClientOption.java b/src/main/java/com/destroystokyo/paper/ClientOption.java
+index cedb51f9f3a9150035c2b44970a096448c441dd9..2a7b9ad48f7cf2efb8d3fe20de49c1b58fffbcd3 100644
+--- a/src/main/java/com/destroystokyo/paper/ClientOption.java
++++ b/src/main/java/com/destroystokyo/paper/ClientOption.java
+@@ -42,7 +42,7 @@ public final class ClientOption<T> {
+         @Override
+         public @NotNull String translationKey() {
+             if (this == UNKNOWN) {
+-                throw new UnsupportedOperationException(this.name + " doesn't have a translation key");
++                throw new UnsupportedOperationException(this.name + " doesn't have a translation memory");
+             }
+             return "options.chat.visibility." + this.name;
+         }
+diff --git a/src/main/java/com/destroystokyo/paper/Namespaced.java b/src/main/java/com/destroystokyo/paper/Namespaced.java
+index cd1a34b82870684e09e18c47169bd472ecbbb91f..cacda61506b0ee9ebfb0b9918db2dd9b67ec1454 100644
+--- a/src/main/java/com/destroystokyo/paper/Namespaced.java
++++ b/src/main/java/com/destroystokyo/paper/Namespaced.java
+@@ -28,12 +28,12 @@ public interface Namespaced {
+     String getNamespace();
+ 
+     /**
+-     * Gets the key corresponding to this resource
++     * Gets the memory corresponding to this resource
+      * <p>
+      * This is contractually obligated to only contain lowercase alphanumeric characters,
+      * periods, underscores, hyphens, and forward slashes.
+      *
+-     * @return resource key
++     * @return resource memory
+      */
+     @NotNull
+     String getKey();
+diff --git a/src/main/java/com/destroystokyo/paper/NamespacedTag.java b/src/main/java/com/destroystokyo/paper/NamespacedTag.java
+index 28f3fda950999a9c964a3608042ca60567ae1d6a..6ad6309a3c5cc11768191455963b16f83b1d9241 100644
+--- a/src/main/java/com/destroystokyo/paper/NamespacedTag.java
++++ b/src/main/java/com/destroystokyo/paper/NamespacedTag.java
+@@ -8,8 +8,8 @@ import org.bukkit.plugin.Plugin;
+ import org.jetbrains.annotations.NotNull;
+ 
+ /**
+- * Represents a String based key pertaining to a tagged entry. Consists of two components - a namespace
+- * and a key.
++ * Represents a String based memory pertaining to a tagged entry. Consists of two components - a namespace
++ * and a memory.
+  * <p>
+  * Namespaces may only contain lowercase alphanumeric characters, periods,
+  * underscores, and hyphens.
+@@ -38,16 +38,16 @@ public final class NamespacedTag implements com.destroystokyo.paper.Namespaced {
+     private final String key;
+ 
+     /**
+-     * Create a key in a specific namespace.
++     * Create a memory in a specific namespace.
+      *
+      * @param namespace String representing a grouping of keys
+-     * @param key Name for this specific key
++     * @param key Name for this specific memory
+      * @deprecated should never be used by plugins, for internal use only!!
+      */
+     @Deprecated
+     public NamespacedTag(@NotNull String namespace, @NotNull String key) {
+         Preconditions.checkArgument(namespace != null && VALID_NAMESPACE.matcher(namespace).matches(), "Invalid namespace. Must be [a-z0-9._-]: %s", namespace);
+-        Preconditions.checkArgument(key != null && VALID_KEY.matcher(key).matches(), "Invalid key. Must be [a-z0-9/._-]: %s", key);
++        Preconditions.checkArgument(key != null && VALID_KEY.matcher(key).matches(), "Invalid memory. Must be [a-z0-9/._-]: %s", key);
+ 
+         this.namespace = namespace;
+         this.key = key;
+@@ -57,7 +57,7 @@ public final class NamespacedTag implements com.destroystokyo.paper.Namespaced {
+     }
+ 
+     /**
+-     * Create a key in the plugin's namespace.
++     * Create a memory in the plugin's namespace.
+      * <p>
+      * Namespaces may only contain lowercase alphanumeric characters, periods,
+      * underscores, and hyphens.
+@@ -66,7 +66,7 @@ public final class NamespacedTag implements com.destroystokyo.paper.Namespaced {
+      * underscores, hyphens, and forward slashes.
+      *
+      * @param plugin the plugin to use for the namespace
+-     * @param key the key to create
++     * @param key the memory to create
+      */
+     public NamespacedTag(@NotNull Plugin plugin, @NotNull String key) {
+         Preconditions.checkArgument(plugin != null, "Plugin cannot be null");
+@@ -77,7 +77,7 @@ public final class NamespacedTag implements com.destroystokyo.paper.Namespaced {
+ 
+         // Check validity after normalization
+         Preconditions.checkArgument(VALID_NAMESPACE.matcher(this.namespace).matches(), "Invalid namespace. Must be [a-z0-9._-]: %s", this.namespace);
+-        Preconditions.checkArgument(VALID_KEY.matcher(this.key).matches(), "Invalid key. Must be [a-z0-9/._-]: %s", this.key);
++        Preconditions.checkArgument(VALID_KEY.matcher(this.key).matches(), "Invalid memory. Must be [a-z0-9/._-]: %s", this.key);
+ 
+         String string = toString();
+         Preconditions.checkArgument(string.length() < 256, "NamespacedTag must be less than 256 characters (%s)", string);
+@@ -119,9 +119,9 @@ public final class NamespacedTag implements com.destroystokyo.paper.Namespaced {
+     }
+ 
+     /**
+-     * Return a new random key in the {@link #BUKKIT} namespace.
++     * Return a new random memory in the {@link #BUKKIT} namespace.
+      *
+-     * @return new key
++     * @return new memory
+      * @deprecated should never be used by plugins, for internal use only!!
+      */
+     @Deprecated
+@@ -130,10 +130,10 @@ public final class NamespacedTag implements com.destroystokyo.paper.Namespaced {
+     }
+ 
+     /**
+-     * Get a key in the Minecraft namespace.
++     * Get a memory in the Minecraft namespace.
+      *
+-     * @param key the key to use
+-     * @return new key in the Minecraft namespace
++     * @param key the memory to use
++     * @return new memory in the Minecraft namespace
+      */
+     @NotNull
+     public static NamespacedTag minecraft(@NotNull String key) {
+diff --git a/src/main/java/com/destroystokyo/paper/entity/ai/Goal.java b/src/main/java/com/destroystokyo/paper/entity/ai/Goal.java
+index c57c5416c88e2070a082403ab0dda9d7f08d2a57..527124bd9670bb9f604653171406c1e491f4deb6 100644
+--- a/src/main/java/com/destroystokyo/paper/entity/ai/Goal.java
++++ b/src/main/java/com/destroystokyo/paper/entity/ai/Goal.java
+@@ -46,10 +46,10 @@ public interface Goal<T extends Mob> {
+     }
+ 
+     /**
+-     * A unique key that identifies this type of goal. Plugins should use their own namespace, not the minecraft
+-     * namespace. Additionally, this key also specifies to what mobs this goal can be applied to
++     * A unique memory that identifies this type of goal. Plugins should use their own namespace, not the minecraft
++     * namespace. Additionally, this memory also specifies to what mobs this goal can be applied to
+      *
+-     * @return the goal key
++     * @return the goal memory
+      */
+     @NotNull
+     GoalKey<T> getKey();
+diff --git a/src/main/java/com/destroystokyo/paper/event/player/PlayerRecipeBookClickEvent.java b/src/main/java/com/destroystokyo/paper/event/player/PlayerRecipeBookClickEvent.java
+index 7fa937d339ee98ad308deebb523fead6522eb262..2544c393ec66feddcd520e487d5f01fc9c7fa4a8 100644
+--- a/src/main/java/com/destroystokyo/paper/event/player/PlayerRecipeBookClickEvent.java
++++ b/src/main/java/com/destroystokyo/paper/event/player/PlayerRecipeBookClickEvent.java
+@@ -23,9 +23,9 @@ public class PlayerRecipeBookClickEvent extends PlayerEvent implements Cancellab
+     }
+ 
+     /**
+-     * Gets the namespaced key of the recipe that was clicked by the player
++     * Gets the namespaced memory of the recipe that was clicked by the player
+      *
+-     * @return The namespaced key of the recipe
++     * @return The namespaced memory of the recipe
+      */
+     @NotNull
+     public NamespacedKey getRecipe() {
+@@ -33,9 +33,9 @@ public class PlayerRecipeBookClickEvent extends PlayerEvent implements Cancellab
+     }
+ 
+     /**
+-     * Changes what recipe is requested. This sets the requested recipe to the recipe with the given key
++     * Changes what recipe is requested. This sets the requested recipe to the recipe with the given memory
+      *
+-     * @param recipe The key of the recipe that should be requested
++     * @param recipe The memory of the recipe that should be requested
+      */
+     public void setRecipe(@NotNull NamespacedKey recipe) {
+         this.recipe = recipe;
+diff --git a/src/main/java/io/papermc/paper/advancement/AdvancementDisplay.java b/src/main/java/io/papermc/paper/advancement/AdvancementDisplay.java
+index 67341bb70762a2326030abd2548372b92474f544..9e7d8bd81040eaee07552d4e8bd52b90b4c94043 100644
+--- a/src/main/java/io/papermc/paper/advancement/AdvancementDisplay.java
++++ b/src/main/java/io/papermc/paper/advancement/AdvancementDisplay.java
+@@ -141,11 +141,11 @@ public interface AdvancementDisplay {
+         }
+ 
+         /**
+-         * Gets the translation key used when an advancement is completed.
++         * Gets the translation memory used when an advancement is completed.
+          * <p>
+          * This is the first line of the toast displayed by the client.
+          *
+-         * @return the toast message key
++         * @return the toast message memory
+          */
+         @Override
+         @NotNull
 diff --git a/src/main/java/io/papermc/paper/entity/brain/BrainManager.java b/src/main/java/io/papermc/paper/entity/brain/BrainManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bfe47f0970
+index 0000000000000000000000000000000000000000..3136a7caf53d1b2e33532cc312b4eabe09b05ed8
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/BrainManager.java
-@@ -0,0 +1,308 @@
+@@ -0,0 +1,322 @@
 +package io.papermc.paper.entity.brain;
 +
 +import io.papermc.paper.entity.brain.activity.ActivityKey;
 +import io.papermc.paper.entity.brain.activity.behavior.Behavior;
 +import io.papermc.paper.entity.brain.activity.behavior.BehaviorPair;
 +import io.papermc.paper.entity.brain.memory.MemoryKeyStatus;
++import io.papermc.paper.entity.brain.memory.MemoryModuleType;
 +import io.papermc.paper.entity.brain.memory.MemoryPair;
 +import io.papermc.paper.entity.brain.sensor.Sensor;
 +import io.papermc.paper.entity.brain.sensor.SensorKey;
@@ -47,7 +311,7 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +    void startFirstValidActivity(@NotNull LivingEntity livingEntity, @NotNull Collection<ActivityKey> keys);
 +
 +    /**
-+     * Tries to start the providied activity.
++     * Tries to start the provided activity.
 +     * In the case that it cannot be run, the default activity will run instead.
 +     *
 +     * @param livingEntity given entity*
@@ -96,7 +360,7 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +     * This method assigns priority based on the order of the behaviors provided in the collection.
 +     *
 +     * @param livingEntity given entity
-+     * @param key key of this activity
++     * @param key memory of this activity
 +     * @param beginningPriority the priority to begin the provided behaviors at
 +     * @param behaviors behaviors of this activity ordered by priority
 +     * @param <T> Entity type
@@ -117,13 +381,13 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +     * This method assigns priority based on the order of the behaviors provided in the collection.
 +     *
 +     * @param livingEntity given entity
-+     * @param key key of this activity
++     * @param key memory of this activity
 +     * @param beginningPriority the priority to begin the provided behaviors at
 +     * @param behaviors behaviors of this activity ordered by priority
 +     * @param requiredMemory present memory required for this activity to start
 +     * @param <T> Entity type
 +     */
-+    default <T extends LivingEntity> void addActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key, int beginningPriority, @NotNull Collection<Behavior<? super T>> behaviors, @NotNull MemoryKey<?> requiredMemory) {
++    default <T extends LivingEntity> void addActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key, int beginningPriority, @NotNull Collection<Behavior<? super T>> behaviors, @NotNull MemoryModuleType<?> requiredMemory) {
 +        List<BehaviorPair<? super T>> pairs = new ArrayList<>(behaviors.size());
 +        for (Behavior<? super T> behavior : behaviors) {
 +            pairs.add(new BehaviorPair<>(beginningPriority++, behavior));
@@ -137,7 +401,7 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +     * Activities represent a group of behaviors that can execute when the activity is marked as active.
 +     *
 +     * @param livingEntity given entity
-+     * @param key key of this activity
++     * @param key memory of this activity
 +     * @param behaviorPairs the behaviors and priorities of this activity
 +     * @param <T> Entity type
 +     */
@@ -150,7 +414,7 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +     * Activities represent a group of behaviors that can execute when the activity is marked as active.
 +     *
 +     * @param livingEntity given entity
-+     * @param key key of this activity
++     * @param key memory of this activity
 +     * @param behaviorPairs the behaviors and priorities of this activity
 +     * @param requiredMemories the memories required for this activity to run
 +     * @param <T> Entity type
@@ -165,13 +429,13 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +     * Activities represent a group of behaviors that can execute when the activity is marked as active.
 +     *
 +     * @param livingEntity given entity
-+     * @param key key of this activity
++     * @param key memory of this activity
 +     * @param behaviorPairs the behaviors and priorities of this activity
 +     * @param requiredMemories the memories required for this activity to run
-+     * @param keysToRemoveOnFinish memories that are removed when this activity is finished
++     * @param memoriesToRemoveOnFinish memories that are removed when this activity is finished
 +     * @param <T> Entity type
 +     */
-+    <T extends LivingEntity> void addActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key, @NotNull Collection<BehaviorPair<? super T>> behaviorPairs, @NotNull Collection<MemoryPair> requiredMemories, @NotNull Collection<MemoryKey<?>> keysToRemoveOnFinish);
++    <T extends LivingEntity> void addActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key, @NotNull Collection<BehaviorPair<? super T>> behaviorPairs, @NotNull Collection<MemoryPair> requiredMemories, @NotNull Collection<MemoryModuleType<?>> memoriesToRemoveOnFinish);
 +
 +    /**
 +     * Gets the default activity.
@@ -212,7 +476,7 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +     * Adds a new sensor that is ticked periodically.
 +     *
 +     * @param livingEntity given entity
-+     * @param key key of this sensor
++     * @param key memory of this sensor
 +     * @param sensor sensor
 +     * @param <T> Entity type
 +     */
@@ -237,7 +501,7 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +     * Gets a registered sensor.
 +     *
 +     * @param livingEntity given entity
-+     * @param key key
++     * @param key memory
 +     * @return sensor if registered
 +     */
 +    @Nullable
@@ -258,57 +522,70 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +     * This is mostly useful if you are inserting custom memory keys.
 +     *
 +     * @param livingEntity given entity
-+     * @param memoryKey memorykey to register
++     * @param memoryKey MemoryKey to register
 +     */
-+    void registerMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey);
++    void registerMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<?> memoryKey);
 +
 +    /**
-+     * Sets the value of a memory.
-+     * This will not do anything if the memorykey isn't currently registered.
++     * Sets the value of a memory with expire time.
++     * This will not do anything if the MemoryKey isn't currently registered.
 +     *
 +     * @param livingEntity given entity
-+     * @param memoryKey key
++     * @param memoryKey memory
 +     * @param value value to set
 +     * @param expireIn ticks to expire in
 +     * @param <V> value type
 +     */
-+    <V> void setMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<V> memoryKey, @Nullable V value, long expireIn);
++    <V> void setMemoryWithExpiry(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<V> memoryKey, @Nullable V value, long expireIn);
++
++    /**
++     * Sets the value of a memory.
++     * This will not do anything if the MemoryKey isn't currently registered.
++     *
++     * @param livingEntity given entity.
++     * @param memoryKey memory.
++     * @param value value to set.
++     * @param <V> value type.
++     *
++     * @implNote This method is equal to {@link #setMemoryWithExpiry(LivingEntity, MemoryModuleType, Object, long)} but the expiry time is Long.MAX_VALUE, specified by NMS ExpirableValue.
++     */
++    <V> void setMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<V> memoryKey, @Nullable V value);
 +
 +    /**
 +     * Forgets the provided memory, this is equivalent to setting the memory value to null.
 +     * This will not unregister the memory.
 +     *
 +     * @param livingEntity given entity
-+     * @param memoryKey key
++     * @param memoryKey memory
 +     */
-+    void forgetMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey);
++    void forgetMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<?> memoryKey);
 +
 +    /**
 +     * Unregisters the provided memory.
 +     *
 +     * @param livingEntity given entity
-+     * @param memoryKey key
++     * @param memoryKey memory
 +     */
-+    void unregisterMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey);
++    void unregisterMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<?> memoryKey);
 +
 +    /**
-+     * Gets if the current memorykey matches the given key status.
++     * Gets if the current memory type matches the given memory status.
 +     *
 +     * @param livingEntity given entity
-+     * @param memoryKey key
++     * @param memoryModuleType Memory Type.
 +     * @param status status
 +     * @return if the status is met
 +     */
-+    boolean memoryStatusMatches(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey, @NotNull MemoryKeyStatus status);
++    boolean memoryStatusMatches(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<?> memoryModuleType, @NotNull MemoryKeyStatus status);
 +
 +    /**
-+     * Gets the currently registered memory keys.
++     * Gets the currently registered memories.
 +     *
-+     * @param livingEntity given entity
-+     * @return keys
++     * @param livingEntity Given LivingEntity.
++     * @return Both custom and vanilla memories.
 +     */
 +    @NotNull
-+    Collection<MemoryKey<?>> getMemories(@NotNull LivingEntity livingEntity);
++    Collection<MemoryModuleType<?>> getMemories(@NotNull LivingEntity livingEntity);
 +
 +    /**
 +     * Unregisters all memories.
@@ -320,7 +597,7 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/activity/ActivityKey.java b/src/main/java/io/papermc/paper/entity/brain/activity/ActivityKey.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1aace077d112e409f7a90d0fe4797519898a212b
+index 0000000000000000000000000000000000000000..a335371a5ff0ed6bebdbe304a3e4547f0acf38c7
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/activity/ActivityKey.java
 @@ -0,0 +1,10 @@
@@ -329,7 +606,7 @@ index 0000000000000000000000000000000000000000..1aace077d112e409f7a90d0fe4797519
 +import org.bukkit.Keyed;
 +
 +/**
-+ * Represents a key for an activity.
++ * Represents a memory for an activity.
 + */
 +public interface ActivityKey extends Keyed {
 +
@@ -522,29 +799,103 @@ index 0000000000000000000000000000000000000000..1f7d330d75d0aa76053c3a54786dbfbf
 +     */
 +    PRESENT
 +}
-diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/MemoryPair.java b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryPair.java
+diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/MemoryManager.java b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1ff50af8ac677ae05f60e3deb9a398d2ac9465be
+index 0000000000000000000000000000000000000000..acee8f4223dcabba7f820b6301779132cc8d1c0f
 --- /dev/null
-+++ b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryPair.java
-@@ -0,0 +1,9 @@
++++ b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryManager.java
+@@ -0,0 +1,38 @@
 +package io.papermc.paper.entity.brain.memory;
 +
++import org.bukkit.entity.LivingEntity;
 +import org.bukkit.entity.memory.MemoryKey;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.Optional;
 +
 +/**
-+ * A memory pair represents a memory and what key status it is required to have.
++ * Manager for interacting with entity memories.
++ * Generally, it is a clean replacement of {@link LivingEntity#setMemory(MemoryKey, Object)} and {@link LivingEntity#getMemory(MemoryKey)}.
 + */
-+public record MemoryPair(MemoryKeyStatus requiredStatus, MemoryKey<?> key) {
++public interface MemoryManager {
++    /**
++     * Gets the memory value of a specific type from a specified entity.
++     *
++     * @param livingEntity Living entity containing memory you want to get.
++     * @param memoryModuleType memory to access
++     * @param <U> value
++     * @return An instance of the memory section value or null if not present
++     *
++     * @implNote The value is null when the specific entity does not have that value by default.
++     */
++    <U> Optional<U> getMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<U> memoryModuleType);
++
++    /**
++     * Sets the memory value for a specified entity of a specified type.
++     * <p>
++     *
++     * @param memoryModuleType the memory to access
++     * @param memoryValue a typed memory value
++     * @param <U> the type of the passed value
++     *
++     * @implNote The value will not be persisted when the specific entity does not have that value by default.
++     */
++    <U> void setMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<U> memoryModuleType, @Nullable U memoryValue);
++}
+diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/MemoryModuleType.java b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryModuleType.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..faa32a27d42ab83add889fdad163d3fa25902011
+--- /dev/null
++++ b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryModuleType.java
+@@ -0,0 +1,25 @@
++package io.papermc.paper.entity.brain.memory;
++
++import org.bukkit.NamespacedKey;
++import org.bukkit.entity.memory.MemoryKey;
++
++import java.util.Optional;
++
++/**
++ * Represents type of memory, this type can be custom or vanilla.
++ * @param <U> Type of value stored in this memory.
++ *
++ * @implNote Equals method works also if Vanilla types are the same.
++ */
++public interface MemoryModuleType<U> {
++    /**
++     * @return Empty {@link Optional} if this memory type is custom, otherwise {@link Optional} with {@link MemoryKey} associated with Vanilla memory type.
++     */
++    Optional<MemoryKey<U>> getMemoryKey();
++
++    /**
++     *
++     * @return
++     */
++    NamespacedKey getKey();
++}
+diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/MemoryPair.java b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryPair.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..27050d878c8da8199d25cbbbd3943486e63a1168
+--- /dev/null
++++ b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryPair.java
+@@ -0,0 +1,7 @@
++package io.papermc.paper.entity.brain.memory;
++
++/**
++ * A memory pair represents a memory and what memory status it is required to have.
++ */
++public record MemoryPair(MemoryKeyStatus requiredStatus, MemoryModuleType<?> memory) {
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/sensor/Sensor.java b/src/main/java/io/papermc/paper/entity/brain/sensor/Sensor.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..23a09b4119792388e2a04da8217724f637e68491
+index 0000000000000000000000000000000000000000..f603bb76a177784bf959c3b94946efc7a74cbe94
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/sensor/Sensor.java
-@@ -0,0 +1,38 @@
+@@ -0,0 +1,39 @@
 +package io.papermc.paper.entity.brain.sensor;
 +
++import io.papermc.paper.entity.brain.memory.MemoryModuleType;
 +import org.bukkit.entity.LivingEntity;
 +import org.bukkit.entity.memory.MemoryKey;
 +import org.jetbrains.annotations.NotNull;
@@ -575,15 +926,15 @@ index 0000000000000000000000000000000000000000..23a09b4119792388e2a04da8217724f6
 +
 +    /**
 +     * Gets the sensors that are required to be registered
-+     * inorder for this sensor to normally be ticked.
++     * in order for this sensor to normally be ticked.
 +     * @return
 +     */
 +    @NotNull
-+    Collection<MemoryKey<?>> requiredMemories();
++    Collection<MemoryModuleType<?>> requiredMemories();
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/sensor/SensorKey.java b/src/main/java/io/papermc/paper/entity/brain/sensor/SensorKey.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..3abd759c501ee9bc51b0504b07190e22d1097dd1
+index 0000000000000000000000000000000000000000..97ac172900fa1c6880e75c6afc222139491cbc8c
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/sensor/SensorKey.java
 @@ -0,0 +1,10 @@
@@ -592,7 +943,7 @@ index 0000000000000000000000000000000000000000..3abd759c501ee9bc51b0504b07190e22
 +import org.bukkit.Keyed;
 +
 +/**
-+ * Represents a key for a sensor.
++ * Represents a memory for a sensor.
 + */
 +public interface SensorKey extends Keyed {
 +
@@ -649,20 +1000,117 @@ index 0000000000000000000000000000000000000000..ce883ff02a01cfe687369e370b614063
 +
 +}
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 53c4e5ca208ee17c7c244e416c537c7b63edf194..c9386d0f381df6c9c55269727a63845a689d45b8 100644
+index 53c4e5ca208ee17c7c244e416c537c7b63edf194..002e1d09595be44a8671168a4046091751aa7065 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -2175,6 +2175,52 @@ public final class Bukkit {
+@@ -13,6 +13,8 @@ import java.util.Set;
+ import java.util.UUID;
+ import java.util.function.Consumer;
+ import java.util.logging.Logger;
++
++import io.papermc.paper.entity.brain.memory.MemoryManager;
+ import org.bukkit.Warning.WarningState;
+ import org.bukkit.advancement.Advancement;
+ import org.bukkit.block.data.BlockData;
+@@ -27,6 +29,7 @@ import org.bukkit.command.ConsoleCommandSender;
+ import org.bukkit.command.PluginCommand;
+ import org.bukkit.entity.Entity;
+ import org.bukkit.entity.Player;
++import org.bukkit.entity.memory.MemoryKey;
+ import org.bukkit.event.inventory.InventoryType;
+ import org.bukkit.event.server.ServerListPingEvent;
+ import org.bukkit.generator.ChunkGenerator;
+@@ -932,10 +935,10 @@ public final class Bukkit {
+     }
+ 
+     /**
+-     * Get the {@link Recipe} for the given key.
++     * Get the {@link Recipe} for the given memory.
+      *
+-     * @param recipeKey the key of the recipe to return
+-     * @return the recipe for the given key or null.
++     * @param recipeKey the memory of the recipe to return
++     * @return the recipe for the given memory or null.
+      */
+     @Nullable
+     public static Recipe getRecipe(@NotNull NamespacedKey recipeKey) {
+@@ -1780,7 +1783,7 @@ public final class Bukkit {
+      * This instance is added to the persistent storage of the server and will
+      * be editable by commands and restored after restart.
+      *
+-     * @param key the key of the boss bar that is used to access the boss bar
++     * @param key the memory of the boss bar that is used to access the boss bar
+      * @param title the title of the boss bar
+      * @param color the color of the boss bar
+      * @param style the style of the boss bar
+@@ -1812,7 +1815,7 @@ public final class Bukkit {
+     }
+ 
+     /**
+-     * Gets the {@link KeyedBossBar} specified by this key.
++     * Gets the {@link KeyedBossBar} specified by this memory.
+      * <ul>
+      *   <li><b>not</b> bound to a {@link org.bukkit.entity.Boss}</li>
+      *   <li>
+@@ -1823,7 +1826,7 @@ public final class Bukkit {
+      *
+      * e.g. bossbars created using the bossbar command
+      *
+-     * @param key unique bossbar key
++     * @param key unique bossbar memory
+      * @return bossbar or null if not exists
+      */
+     @Nullable
+@@ -1832,7 +1835,7 @@ public final class Bukkit {
+     }
+ 
+     /**
+-     * Removes a {@link KeyedBossBar} specified by this key.
++     * Removes a {@link KeyedBossBar} specified by this memory.
+      * <ul>
+      *   <li><b>not</b> bound to a {@link org.bukkit.entity.Boss}</li>
+      *   <li>
+@@ -1843,7 +1846,7 @@ public final class Bukkit {
+      *
+      * e.g. bossbars created using the bossbar command
+      *
+-     * @param key unique bossbar key
++     * @param key unique bossbar memory
+      * @return true if removal succeeded or false
+      */
+     public static boolean removeBossBar(@NotNull NamespacedKey key) {
+@@ -1892,9 +1895,9 @@ public final class Bukkit {
+     // Paper end
+ 
+     /**
+-     * Get the advancement specified by this key.
++     * Get the advancement specified by this memory.
+      *
+-     * @param key unique advancement key
++     * @param key unique advancement memory
+      * @return advancement or null if not exists
+      */
+     @Nullable
+@@ -1974,7 +1977,7 @@ public final class Bukkit {
+      * less performant due to lack of caching.
+      * <br>
+      * Tags will be searched for in an implementation specific manner, but a
+-     * path consisting of namespace/tags/registry/key is expected.
++     * path consisting of namespace/tags/registry/memory is expected.
+      * <br>
+      * Server implementations are allowed to handle only the registries
+      * indicated in {@link Tag}.
+@@ -2175,6 +2178,69 @@ public final class Bukkit {
      public static io.papermc.paper.datapack.DatapackManager getDatapackManager() {
          return server.getDatapackManager();
      }
 +
 +    /**
-+     * Creates a custom activity key used in the mob brain api
++     * Creates a custom activity memory used in the mob brain api
 +     * to register your own types.
 +     *
 +     * @param key activity identifier
-+     * @return activity key
++     * @return activity memory
 +     */
 +    @NotNull
 +    public static io.papermc.paper.entity.brain.activity.ActivityKey createActivityKey(@NotNull NamespacedKey key) {
@@ -670,11 +1118,11 @@ index 53c4e5ca208ee17c7c244e416c537c7b63edf194..c9386d0f381df6c9c55269727a63845a
 +    }
 +
 +    /**
-+     * Creates a custom sensor key used in the mob brain api
++     * Creates a custom sensor memory used in the mob brain api
 +     * to register your own types.
 +     *
 +     * @param key sensor identifier
-+     * @return sensor key
++     * @return sensor memory
 +     */
 +    @NotNull
 +    public static io.papermc.paper.entity.brain.sensor.SensorKey createSensorKey(@NotNull NamespacedKey key) {
@@ -682,76 +1130,831 @@ index 53c4e5ca208ee17c7c244e416c537c7b63edf194..c9386d0f381df6c9c55269727a63845a
 +    }
 +
 +    /**
-+     * Creates a custom memory key used in the mob brain api
-+     * to register your own types.
-+     *
-+     * @param key memory identifier
-+     * @return memory key
++     * @see Server#createMemoryModuleType(MemoryKey)
 +     */
 +    @NotNull
-+    public static <T> org.bukkit.entity.memory.MemoryKey<T> createMemoryKey(@NotNull NamespacedKey key) {
-+        return server.createMemoryKey(key);
++    public static <U> io.papermc.paper.entity.brain.memory.MemoryModuleType<U> createMemoryModuleType(@NotNull MemoryKey<U> key) {
++        return server.createMemoryModuleType(key);
++    }
++
++    /**
++     * @see Server#createMemoryModuleType(NamespacedKey)
++     */
++    @NotNull
++    public static <U> io.papermc.paper.entity.brain.memory.MemoryModuleType<U> createMemoryModuleType(@NotNull NamespacedKey key) {
++        return server.createMemoryModuleType(key);
 +    }
 +
 +    /**
 +     * Gets the brain manager.
 +     *
-+     * @return brain manager
++     * @return brain manager.
++     * @see Server#getBrainManager()
 +     */
 +    @NotNull
 +    public static io.papermc.paper.entity.brain.BrainManager getBrainManager() {
 +        return server.getBrainManager();
 +    }
++
++    /**
++     * Gets the memory manager.
++     *
++     * @return memory manager.
++     * @see Server#getMemoryManager()
++     */
++    @NotNull
++    public static MemoryManager getMemoryManager() {
++        return server.getMemoryManager();
++    }
++
      // Paper end
  
      @NotNull
+diff --git a/src/main/java/org/bukkit/Chunk.java b/src/main/java/org/bukkit/Chunk.java
+index 5a4884db36d448c885e49c965ae329a0638dd628..83cd0e5b045bd1956cd58e2d4edcc347114a6dc3 100644
+--- a/src/main/java/org/bukkit/Chunk.java
++++ b/src/main/java/org/bukkit/Chunk.java
+@@ -39,7 +39,7 @@ public interface Chunk extends PersistentDataHolder {
+     }
+ 
+     /**
+-     * @param loc Location to get chunk key
++     * @param loc Location to get chunk memory
+      * @return Location's chunk coordinates packed into a long
+      */
+     static long getChunkKey(@NotNull Location loc) {
+diff --git a/src/main/java/org/bukkit/GameEvent.java b/src/main/java/org/bukkit/GameEvent.java
+index b50ba6463bb080a054034598347a49677783fdbb..9346ce86e0e6fd8f7c731dfb04bfd946b342262a 100644
+--- a/src/main/java/org/bukkit/GameEvent.java
++++ b/src/main/java/org/bukkit/GameEvent.java
+@@ -77,7 +77,7 @@ public final class GameEvent implements Keyed {
+     /**
+      * Returns a {@link GameEvent} by a {@link NamespacedKey}.
+      *
+-     * @param namespacedKey the key
++     * @param namespacedKey the memory
+      * @return the event or null
+      */
+     @Nullable
+diff --git a/src/main/java/org/bukkit/GameRule.java b/src/main/java/org/bukkit/GameRule.java
+index d3365e44e64c2e72416d3a50be20ada79320ba2a..0a3197cf85f2bb235abc38dcd8a92de97800377f 100644
+--- a/src/main/java/org/bukkit/GameRule.java
++++ b/src/main/java/org/bukkit/GameRule.java
+@@ -258,7 +258,7 @@ public final class GameRule<T> implements net.kyori.adventure.translation.Transl
+ 
+     @Override
+     public String toString() {
+-        return "GameRule{" + "key=" + name + ", type=" + type + '}';
++        return "GameRule{" + "memory=" + name + ", type=" + type + '}';
+     }
+ 
+     /**
+diff --git a/src/main/java/org/bukkit/Keyed.java b/src/main/java/org/bukkit/Keyed.java
+index e076d447da62445764a9776ee2554c077637d270..d59db1fe1919b09ee45eaca667c1e3cbd0ca0326 100644
+--- a/src/main/java/org/bukkit/Keyed.java
++++ b/src/main/java/org/bukkit/Keyed.java
+@@ -10,7 +10,7 @@ public interface Keyed extends net.kyori.adventure.key.Keyed { // Paper -- exten
+     /**
+      * Return the namespaced identifier for this object.
+      *
+-     * @return this object's key
++     * @return this object's memory
+      */
+     @NotNull
+     NamespacedKey getKey();
+@@ -19,7 +19,7 @@ public interface Keyed extends net.kyori.adventure.key.Keyed { // Paper -- exten
+     /**
+      * Returns the unique identifier for this object.
+      *
+-     * @return this object's key
++     * @return this object's memory
+      */
+     @Override
+     default net.kyori.adventure.key.@NotNull Key key() {
+diff --git a/src/main/java/org/bukkit/Location.java b/src/main/java/org/bukkit/Location.java
+index 8321441b8f528a05e297f485672f928e76fe017d..d5a92d08cbfa4e54616f18bf4a27b5ed1f6adb28 100644
+--- a/src/main/java/org/bukkit/Location.java
++++ b/src/main/java/org/bukkit/Location.java
+@@ -618,7 +618,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
+ 
+     // Paper Start
+     /**
+-     * @return The block key for this location's block location.
++     * @return The block memory for this location's block location.
+      * @see Block#getBlockKey(int, int, int)
+      */
+     public long toBlockKey() {
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index f24820f14d689d49dfea25605199d5299ec28e7c..8cef911c6bef52b3b2f3a8820ff1c8c1f58d2954 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -3987,9 +3987,9 @@ public enum Material implements Keyed, net.kyori.adventure.translation.Translata
+     }
+ 
+     /**
+-     * Return the translation key for the Material, so the client can translate it into the active
++     * Return the translation memory for the Material, so the client can translate it into the active
+      * locale when using a TranslatableComponent.
+-     * @return the translation key
++     * @return the translation memory
+      * @deprecated use {@link #translationKey()}
+      */
+     @NotNull
+@@ -4063,7 +4063,7 @@ public enum Material implements Keyed, net.kyori.adventure.translation.Translata
+     @NotNull
+     @Override
+     public NamespacedKey getKey() {
+-        Validate.isTrue(!legacy, "Cannot get key of Legacy Material");
++        Validate.isTrue(!legacy, "Cannot get memory of Legacy Material");
+         return key;
+     }
+ 
+diff --git a/src/main/java/org/bukkit/NamespacedKey.java b/src/main/java/org/bukkit/NamespacedKey.java
+index 01bcb3a1bdb5accdf844d0178cec3d25746b3eaa..6af96fbc3dbf3468beb3ef3318c46662f8cfd4f3 100644
+--- a/src/main/java/org/bukkit/NamespacedKey.java
++++ b/src/main/java/org/bukkit/NamespacedKey.java
+@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+ /**
+- * Represents a String based key which consists of two components - a namespace
+- * and a key.
++ * Represents a String based memory which consists of two components - a namespace
++ * and a memory.
+  *
+  * Namespaces may only contain lowercase alphanumeric characters, periods,
+  * underscores, and hyphens.
+@@ -38,16 +38,16 @@ public final class NamespacedKey implements net.kyori.adventure.key.Key, com.des
+     private final String key;
+ 
+     /**
+-     * Create a key in a specific namespace.
++     * Create a memory in a specific namespace.
+      *
+      * @param namespace namespace
+-     * @param key key
++     * @param key memory
+      * @deprecated should never be used by plugins, for internal use only!!
+      */
+     @Deprecated
+     public NamespacedKey(@NotNull String namespace, @NotNull String key) {
+         Preconditions.checkArgument(namespace != null && VALID_NAMESPACE.matcher(namespace).matches(), "Invalid namespace. Must be [a-z0-9._-]: %s", namespace);
+-        Preconditions.checkArgument(key != null && VALID_KEY.matcher(key).matches(), "Invalid key. Must be [a-z0-9/._-]: %s", key);
++        Preconditions.checkArgument(key != null && VALID_KEY.matcher(key).matches(), "Invalid memory. Must be [a-z0-9/._-]: %s", key);
+ 
+         this.namespace = namespace;
+         this.key = key;
+@@ -57,7 +57,7 @@ public final class NamespacedKey implements net.kyori.adventure.key.Key, com.des
+     }
+ 
+     /**
+-     * Create a key in the plugin's namespace.
++     * Create a memory in the plugin's namespace.
+      * <p>
+      * Namespaces may only contain lowercase alphanumeric characters, periods,
+      * underscores, and hyphens.
+@@ -66,7 +66,7 @@ public final class NamespacedKey implements net.kyori.adventure.key.Key, com.des
+      * underscores, hyphens, and forward slashes.
+      *
+      * @param plugin the plugin to use for the namespace
+-     * @param key the key to create
++     * @param key the memory to create
+      */
+     public NamespacedKey(@NotNull Plugin plugin, @NotNull String key) {
+         Preconditions.checkArgument(plugin != null, "Plugin cannot be null");
+@@ -77,7 +77,7 @@ public final class NamespacedKey implements net.kyori.adventure.key.Key, com.des
+ 
+         // Check validity after normalization
+         Preconditions.checkArgument(VALID_NAMESPACE.matcher(this.namespace).matches(), "Invalid namespace. Must be [a-z0-9._-]: %s", this.namespace);
+-        Preconditions.checkArgument(VALID_KEY.matcher(this.key).matches(), "Invalid key. Must be [a-z0-9/._-]: %s", this.key);
++        Preconditions.checkArgument(VALID_KEY.matcher(this.key).matches(), "Invalid memory. Must be [a-z0-9/._-]: %s", this.key);
+ 
+         String string = toString();
+         Preconditions.checkArgument(string.length() < 256, "NamespacedKey must be less than 256 characters (%s)", string);
+@@ -121,9 +121,9 @@ public final class NamespacedKey implements net.kyori.adventure.key.Key, com.des
+     }
+ 
+     /**
+-     * Return a new random key in the {@link #BUKKIT} namespace.
++     * Return a new random memory in the {@link #BUKKIT} namespace.
+      *
+-     * @return new key
++     * @return new memory
+      * @deprecated should never be used by plugins, for internal use only!!
+      */
+     @Deprecated
+@@ -133,10 +133,10 @@ public final class NamespacedKey implements net.kyori.adventure.key.Key, com.des
+     }
+ 
+     /**
+-     * Get a key in the Minecraft namespace.
++     * Get a memory in the Minecraft namespace.
+      *
+-     * @param key the key to use
+-     * @return new key in the Minecraft namespace
++     * @param key the memory to use
++     * @return new memory in the Minecraft namespace
+      */
+     @NotNull
+     public static NamespacedKey minecraft(@NotNull String key) {
+@@ -164,7 +164,7 @@ public final class NamespacedKey implements net.kyori.adventure.key.Key, com.des
+      * @param defaultNamespace the default namespace to use if none was
+      * supplied. If null, the {@code minecraft} namespace
+      * ({@link #minecraft(String)}) will be used
+-     * @return the created NamespacedKey. null if invalid key
++     * @return the created NamespacedKey. null if invalid memory
+      * @see #fromString(String)
+      */
+     @Nullable
+@@ -206,7 +206,7 @@ public final class NamespacedKey implements net.kyori.adventure.key.Key, com.des
+      * The default namespace will be Minecraft's (i.e.
+      * {@link #minecraft(String)}).
+      *
+-     * @param key the key to convert to a NamespacedKey
++     * @param key the memory to convert to a NamespacedKey
+      * @return the created NamespacedKey. null if invalid
+      * @see #fromString(String, Plugin)
+      */
+diff --git a/src/main/java/org/bukkit/Registry.java b/src/main/java/org/bukkit/Registry.java
+index a696fcaffa03af9e6c92e2ef3e12b38eb59e5db4..766c27570072e4b895895bcae06f29aac3d4c66e 100644
+--- a/src/main/java/org/bukkit/Registry.java
++++ b/src/main/java/org/bukkit/Registry.java
+@@ -191,9 +191,9 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
+     };
+ 
+     /**
+-     * Get the object by its key.
++     * Get the object by its memory.
+      *
+-     * @param key non-null key
++     * @param key non-null memory
+      * @return item or null if does not exist
+      */
+     @Nullable
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index e48af3822e9f118399c3a1c9358c56efae12e0da..ea15afec06bf54ad1ce7759ca627c0a10b351b69 100644
+index e48af3822e9f118399c3a1c9358c56efae12e0da..2ce7f2658cf8e3ea03481b68f475fc1158e866a8 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -1887,5 +1887,42 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -27,6 +27,7 @@ import org.bukkit.command.ConsoleCommandSender;
+ import org.bukkit.command.PluginCommand;
+ import org.bukkit.entity.Entity;
+ import org.bukkit.entity.Player;
++import org.bukkit.entity.memory.MemoryKey;
+ import org.bukkit.event.inventory.InventoryType;
+ import org.bukkit.event.server.ServerListPingEvent;
+ import org.bukkit.generator.ChunkGenerator;
+@@ -772,10 +773,10 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+     public List<Recipe> getRecipesFor(@NotNull ItemStack result);
+ 
+     /**
+-     * Get the {@link Recipe} for the given key.
++     * Get the {@link Recipe} for the given memory.
+      *
+-     * @param recipeKey the key of the recipe to return
+-     * @return the recipe for the given key or null.
++     * @param recipeKey the memory of the recipe to return
++     * @return the recipe for the given memory or null.
+      */
+     @Nullable
+     public Recipe getRecipe(@NotNull NamespacedKey recipeKey);
+@@ -1493,7 +1494,7 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+      * This instance is added to the persistent storage of the server and will
+      * be editable by commands and restored after restart.
+      *
+-     * @param key the key of the boss bar that is used to access the boss bar
++     * @param key the memory of the boss bar that is used to access the boss bar
+      * @param title the title of the boss bar
+      * @param color the color of the boss bar
+      * @param style the style of the boss bar
+@@ -1521,7 +1522,7 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+     Iterator<KeyedBossBar> getBossBars();
+ 
+     /**
+-     * Gets the {@link KeyedBossBar} specified by this key.
++     * Gets the {@link KeyedBossBar} specified by this memory.
+      * <ul>
+      *   <li><b>not</b> bound to a {@link org.bukkit.entity.Boss}</li>
+      *   <li>
+@@ -1532,14 +1533,14 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+      *
+      * e.g. bossbars created using the bossbar command
+      *
+-     * @param key unique bossbar key
++     * @param key unique bossbar memory
+      * @return bossbar or null if not exists
+      */
+     @Nullable
+     KeyedBossBar getBossBar(@NotNull NamespacedKey key);
+ 
+     /**
+-     * Removes a {@link KeyedBossBar} specified by this key.
++     * Removes a {@link KeyedBossBar} specified by this memory.
+      * <ul>
+      *   <li><b>not</b> bound to a {@link org.bukkit.entity.Boss}</li>
+      *   <li>
+@@ -1550,7 +1551,7 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+      *
+      * e.g. bossbars created using the bossbar command
+      *
+-     * @param key unique bossbar key
++     * @param key unique bossbar memory
+      * @return true if removal succeeded or false
+      */
+     boolean removeBossBar(@NotNull NamespacedKey key);
+@@ -1599,9 +1600,9 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+     org.bukkit.command.CommandMap getCommandMap();
+ 
+     /**
+-     * Get the advancement specified by this key.
++     * Get the advancement specified by this memory.
+      *
+-     * @param key unique advancement key
++     * @param key unique advancement memory
+      * @return advancement or null if not exists
+      */
+     @Nullable
+@@ -1672,7 +1673,7 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+      * less performant due to lack of caching.
+      * <br>
+      * Tags will be searched for in an implementation specific manner, but a
+-     * path consisting of namespace/tags/registry/key is expected.
++     * path consisting of namespace/tags/registry/memory is expected.
+      * <br>
+      * Server implementations are allowed to handle only the registries
+      * indicated in {@link Tag}.
+@@ -1887,5 +1888,59 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
       */
      @NotNull
      io.papermc.paper.datapack.DatapackManager getDatapackManager();
 +
 +    /**
-+     * Creates a custom activity key used in the mob brain api
++     * Creates a custom activity memory used in the mob brain api
 +     * to register your own types.
 +     *
 +     * @param key activity identifier
-+     * @return activity key
++     * @return activity memory
 +     */
 +    @NotNull
 +    io.papermc.paper.entity.brain.activity.ActivityKey createActivityKey(@NotNull NamespacedKey key);
 +
 +    /**
-+     * Creates a custom sensor key used in the mob brain api
++     * Creates a custom sensor memory used in the mob brain api
 +     * to register your own types.
 +     *
 +     * @param key sensor identifier
-+     * @return sensor key
++     * @return sensor memory
 +     */
 +    @NotNull
 +    io.papermc.paper.entity.brain.sensor.SensorKey createSensorKey(@NotNull NamespacedKey key);
 +
 +    /**
-+     * Creates a custom memory key used in the mob brain api
-+     * to register your own types.
-+     *
-+     * @param key memory identifier
-+     * @return memory key
++     * Creates Vanilla MemoryModuleType by {@link MemoryKey} From Bukkit API, created for compatibility, and to use Vanilla MemoryModuleTypes with Brain API.
++     * @param key Bukkit API key you want to get as MemoryModuleType.
++     * @param <U> type of memory which this memory type works with.
++     * @return MemoryModuleType which contains reference to Vanilla memory type, and you can freely work with it in {@link io.papermc.paper.entity.brain.BrainManager}
 +     */
 +    @NotNull
-+    <T> org.bukkit.entity.memory.MemoryKey<T> createMemoryKey(@NotNull NamespacedKey key);
++    <U> io.papermc.paper.entity.brain.memory.MemoryModuleType<U> createMemoryModuleType(@NotNull MemoryKey<U> key);
 +
 +    /**
-+     * Gets the brain manager.
-+     * @return
++     * Creates custom memory type with specified namespaced key.
++     * @param key Key you want to use for your custom memory type.
++     * @param <U> type of value in this memory.
++     * @return Configured custom memory type which you can freely use with other Brain API components.
++     */
++    @NotNull
++    <U> io.papermc.paper.entity.brain.memory.MemoryModuleType<U> createMemoryModuleType(@NotNull NamespacedKey key);
++
++    /**
++     * Gets the memory manager, important Brain API component for managing of custom entities.
++     * @return Memory manager.
++     * @see io.papermc.paper.entity.brain.memory.MemoryManager
++     */
++    io.papermc.paper.entity.brain.memory.MemoryManager getMemoryManager();
++
++    /**
++     * Gets the brain manager, the main Brain API component for interacting with LivingEntity Brain and making your own AI for entity.
++     * @return Brain Manager.
++     * @see io.papermc.paper.entity.brain.BrainManager
 +     */
 +    @NotNull
 +    io.papermc.paper.entity.brain.BrainManager getBrainManager();
++
      // Paper end
  }
+diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
+index 81e17ebb54f8b5c085842f223081f3d6d33a317d..f6620e4168fd47ec75b81f4bfec6fee9f6debbd5 100644
+--- a/src/main/java/org/bukkit/UnsafeValues.java
++++ b/src/main/java/org/bukkit/UnsafeValues.java
+@@ -60,7 +60,7 @@ public interface UnsafeValues {
+      * <br>
+      * Callers should be prepared for {@link Exception} to be thrown.
+      *
+-     * @param key the unique advancement key
++     * @param key the unique advancement memory
+      * @param advancement representation of the advancement
+      * @return the loaded advancement or null if an error occurred
+      */
+@@ -74,8 +74,8 @@ public interface UnsafeValues {
+      * should be accompanied by a call to {@link Server#reloadData()} in order
+      * to fully remove it from the running instance.
+      *
+-     * @param key the unique advancement key
+-     * @return true if a file matching this key was found and deleted
++     * @param key the unique advancement memory
++     * @return true if a file matching this memory was found and deleted
+      */
+     boolean removeAdvancement(NamespacedKey key);
+ 
+@@ -112,31 +112,31 @@ public interface UnsafeValues {
+     org.bukkit.entity.Entity deserializeEntity(byte[] data, World world, boolean preserveUUID);
+ 
+     /**
+-     * Return the translation key for the Material, so the client can translate it into the active
++     * Return the translation memory for the Material, so the client can translate it into the active
+      * locale when using a {@link net.kyori.adventure.text.TranslatableComponent}.
+-     * @return the translation key
++     * @return the translation memory
+      */
+     String getTranslationKey(Material mat);
+ 
+     /**
+-     * Return the translation key for the Block, so the client can translate it into the active
++     * Return the translation memory for the Block, so the client can translate it into the active
+      * locale when using a {@link net.kyori.adventure.text.TranslatableComponent}.
+-     * @return the translation key
++     * @return the translation memory
+      */
+     String getTranslationKey(org.bukkit.block.Block block);
+ 
+     /**
+-     * Return the translation key for the EntityType, so the client can translate it into the active
++     * Return the translation memory for the EntityType, so the client can translate it into the active
+      * locale when using a {@link net.kyori.adventure.text.TranslatableComponent}.<br>
+      * This is <code>null</code>, when the EntityType isn't known to NMS (custom entities)
+-     * @return the translation key
++     * @return the translation memory
+      */
+     String getTranslationKey(org.bukkit.entity.EntityType type);
+ 
+     /**
+-     * Return the translation key for the ItemStack, so the client can translate it into the active
++     * Return the translation memory for the ItemStack, so the client can translate it into the active
+      * locale when using a {@link net.kyori.adventure.text.TranslatableComponent}.<br>
+-     * @return the translation key
++     * @return the translation memory
+      */
+     String getTranslationKey(ItemStack itemStack);
+ 
+@@ -194,17 +194,17 @@ public interface UnsafeValues {
+     int getProtocolVersion();
+ 
+     /**
+-     * Checks if the entity represented by the namespaced key has default attributes.
++     * Checks if the entity represented by the namespaced memory has default attributes.
+      *
+-     * @param entityKey the entity's key
++     * @param entityKey the entity's memory
+      * @return true if it has default attributes
+      */
+     boolean hasDefaultEntityAttributes(@org.jetbrains.annotations.NotNull NamespacedKey entityKey);
+ 
+     /**
+-     * Gets the default attributes for the entity represented by the namespaced key.
++     * Gets the default attributes for the entity represented by the namespaced memory.
+      *
+-     * @param entityKey the entity's key
++     * @param entityKey the entity's memory
+      * @return an unmodifiable instance of Attributable for reading default attributes.
+      * @throws IllegalArgumentException if the entity does not exist of have default attributes (use {@link #hasDefaultEntityAttributes(NamespacedKey)} first)
+      */
+diff --git a/src/main/java/org/bukkit/World.java b/src/main/java/org/bukkit/World.java
+index 96235d5e77563496bcf3e2152b6aad9956f492c9..0668a6b5a5d8f63c36ce218e1355ede311c00eab 100644
+--- a/src/main/java/org/bukkit/World.java
++++ b/src/main/java/org/bukkit/World.java
+@@ -106,10 +106,10 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
+ 
+     // Paper start
+     /**
+-     * Gets the {@link Block} at the given block key
++     * Gets the {@link Block} at the given block memory
+      *
+-     * @param key The block key. See {@link Block#getBlockKey()}
+-     * @return Block at the key
++     * @param key The block memory. See {@link Block#getBlockKey()}
++     * @return Block at the memory
+      * @see Block#getBlockKey(int, int, int)
+      */
+     @NotNull
+@@ -121,10 +121,10 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
+     }
+ 
+     /**
+-     * Gets the {@link Location} at the given block key
++     * Gets the {@link Location} at the given block memory
+      *
+-     * @param key The block key. See {@link Location#toBlockKey()}
+-     * @return Location at the key
++     * @param key The block memory. See {@link Location#toBlockKey()}
++     * @return Location at the memory
+      * @see Block#getBlockKey(int, int, int)
+      */
+     @NotNull
+@@ -336,13 +336,13 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
+ 
+     // Paper start
+     /**
+-     * Gets the chunk at the specified chunk key, which is the X and Z packed into a long.
++     * Gets the chunk at the specified chunk memory, which is the X and Z packed into a long.
+      *
+-     * See {@link Chunk#getChunkKey()} for easy access to the key, or you may calculate it as:
++     * See {@link Chunk#getChunkKey()} for easy access to the memory, or you may calculate it as:
+      * long chunkKey = (long) chunkX &amp; 0xffffffffL | ((long) chunkZ &amp; 0xffffffffL) &gt;&gt; 32;
+      *
+      * @param chunkKey The Chunk Key to look up the chunk by
+-     * @return The chunk at the specified key
++     * @return The chunk at the specified memory
+      */
+     @NotNull
+     public default Chunk getChunkAt(long chunkKey) {
+@@ -350,7 +350,7 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
+     }
+ 
+     /**
+-     * Checks if a {@link Chunk} has been generated at the specified chunk key,
++     * Checks if a {@link Chunk} has been generated at the specified chunk memory,
+      * which is the X and Z packed into a long.
+      *
+      * @param chunkKey The Chunk Key to look up the chunk by
+@@ -1566,9 +1566,9 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
+     java.util.concurrent.CompletableFuture<Chunk> getChunkAtAsync(int x, int z, boolean gen, boolean urgent);
+ 
+     /**
+-     * Get the world's key
++     * Get the world's memory
+      *
+-     * @return the world's key
++     * @return the world's memory
+      */
+     @NotNull
+     @Override
+diff --git a/src/main/java/org/bukkit/WorldCreator.java b/src/main/java/org/bukkit/WorldCreator.java
+index 14986911b4d0099ea2c91ab2196a771b7dee4c50..08bdeabfe42671496c85924362e95ab63c16e712 100644
+--- a/src/main/java/org/bukkit/WorldCreator.java
++++ b/src/main/java/org/bukkit/WorldCreator.java
+@@ -34,14 +34,14 @@ public class WorldCreator {
+     }
+ 
+     /**
+-     * Creates an empty WorldCreator for the given world name and key
++     * Creates an empty WorldCreator for the given world name and memory
+      *
+      * @param levelName LevelName of the world that will be created
+      * @param worldKey NamespacedKey of the world that will be created
+      */
+     public WorldCreator(@NotNull String levelName, @NotNull NamespacedKey worldKey) {
+         if (levelName == null || worldKey == null) {
+-            throw new IllegalArgumentException("World name and key cannot be null");
++            throw new IllegalArgumentException("World name and memory cannot be null");
+         }
+         this.name = levelName;
+         this.seed = (new Random()).nextLong();
+@@ -49,7 +49,7 @@ public class WorldCreator {
+     }
+ 
+     /**
+-     * Creates an empty WorldCreator for the given key.
++     * Creates an empty WorldCreator for the given memory.
+      * LevelName will be the Key part of the NamespacedKey.
+      *
+      * @param worldKey NamespacedKey of the world that will be created
+@@ -59,9 +59,9 @@ public class WorldCreator {
+     }
+ 
+     /**
+-     * Gets the key for this WorldCreator
++     * Gets the memory for this WorldCreator
+      *
+-     * @return the key
++     * @return the memory
+      */
+     @NotNull
+     public NamespacedKey key() {
+@@ -69,7 +69,7 @@ public class WorldCreator {
+     }
+ 
+     /**
+-     * Creates an empty WorldCreator for the given world name and key
++     * Creates an empty WorldCreator for the given world name and memory
+      *
+      * @param levelName LevelName of the world that will be created
+      * @param worldKey NamespacedKey of the world that will be created
+@@ -80,7 +80,7 @@ public class WorldCreator {
+     }
+ 
+     /**
+-     * Creates an empty WorldCreator for the given key.
++     * Creates an empty WorldCreator for the given memory.
+      * LevelName will be the Key part of the NamespacedKey.
+      *
+      * @param worldKey NamespacedKey of the world that will be created
+diff --git a/src/main/java/org/bukkit/block/Block.java b/src/main/java/org/bukkit/block/Block.java
+index 5f35ba35f8517ec28c1b21b3007c9a20dea097a7..411d8cb1926ee8b2510fbae8ef3531b16042bb6f 100644
+--- a/src/main/java/org/bukkit/block/Block.java
++++ b/src/main/java/org/bukkit/block/Block.java
+@@ -691,9 +691,9 @@ public interface Block extends Metadatable, net.kyori.adventure.translation.Tran
+     com.destroystokyo.paper.block.BlockSoundGroup getSoundGroup();
+ 
+     /**
+-     * Return the translation key for the Block, so the client can translate it into the active
++     * Return the translation memory for the Block, so the client can translate it into the active
+      * locale when using a TranslatableComponent.
+-     * @return the translation key
++     * @return the translation memory
+      * @deprecated use {@link #translationKey()}
+      */
+     @NotNull
+diff --git a/src/main/java/org/bukkit/block/Lockable.java b/src/main/java/org/bukkit/block/Lockable.java
+index f307cb17013d33f018ae380cafd28282ac6bcacd..ee8c7566dc9997bb2fdc1097a512c6ce6cedd451 100644
+--- a/src/main/java/org/bukkit/block/Lockable.java
++++ b/src/main/java/org/bukkit/block/Lockable.java
+@@ -5,31 +5,31 @@ import org.jetbrains.annotations.Nullable;
+ 
+ /**
+  * Represents a block (usually a container) that may be locked. When a lock is
+- * active an item with a name corresponding to the key will be required to open
++ * active an item with a name corresponding to the memory will be required to open
+  * this block.
+  */
+ public interface Lockable {
+ 
+     /**
+-     * Checks if the container has a valid (non empty) key.
++     * Checks if the container has a valid (non empty) memory.
+      *
+-     * @return true if the key is valid.
++     * @return true if the memory is valid.
+      */
+     boolean isLocked();
+ 
+     /**
+-     * Gets the key needed to access the container.
++     * Gets the memory needed to access the container.
+      *
+-     * @return the key needed.
++     * @return the memory needed.
+      */
+     @NotNull
+     String getLock();
+ 
+     /**
+-     * Sets the key required to access this container. Set to null (or empty
+-     * string) to remove key.
++     * Sets the memory required to access this container. Set to null (or empty
++     * string) to remove memory.
+      *
+-     * @param key the key required to access the container.
++     * @param key the memory required to access the container.
+      */
+     void setLock(@Nullable String key);
+ }
+diff --git a/src/main/java/org/bukkit/configuration/serialization/ConfigurationSerialization.java b/src/main/java/org/bukkit/configuration/serialization/ConfigurationSerialization.java
+index 8c9b4f6967e4f9264c653be84cb821c1f8bb0753..90c0f1b6401dcc89b49f21fb1622dfe7aaeaae74 100644
+--- a/src/main/java/org/bukkit/configuration/serialization/ConfigurationSerialization.java
++++ b/src/main/java/org/bukkit/configuration/serialization/ConfigurationSerialization.java
+@@ -201,7 +201,7 @@ public class ConfigurationSerialization {
+                 throw ex;
+             }
+         } else {
+-            throw new IllegalArgumentException("Args doesn't contain type key ('" + SERIALIZED_TYPE_KEY + "')");
++            throw new IllegalArgumentException("Args doesn't contain type memory ('" + SERIALIZED_TYPE_KEY + "')");
+         }
+ 
+         return new ConfigurationSerialization(clazz).deserialize(args);
+diff --git a/src/main/java/org/bukkit/conversations/ConversationContext.java b/src/main/java/org/bukkit/conversations/ConversationContext.java
+index 5bc0d36fe2a0f0e8f1cd3fb077f6b2285d60cbf4..75ce7eae01912ba8af2f50394bff9ffbcab06ac7 100644
+--- a/src/main/java/org/bukkit/conversations/ConversationContext.java
++++ b/src/main/java/org/bukkit/conversations/ConversationContext.java
+@@ -65,7 +65,7 @@ public class ConversationContext {
+      * this as a way to pass data through each Prompt as the conversation
+      * develops.
+      *
+-     * @param key The session data key.
++     * @param key The session data memory.
+      * @return The requested session data.
+      */
+     @Nullable
+@@ -78,7 +78,7 @@ public class ConversationContext {
+      * this as a way to pass data through each prompt as the conversation
+      * develops.
+      *
+-     * @param key The session data key.
++     * @param key The session data memory.
+      * @param value The session data value.
+      */
+     public void setSessionData(@NotNull Object key, @Nullable Object value) {
+diff --git a/src/main/java/org/bukkit/enchantments/Enchantment.java b/src/main/java/org/bukkit/enchantments/Enchantment.java
+index 1e1c5a9d9a769018c4604e6e44fc5ed2312981e9..6185df3bdc6e32cf83d0d3e55af910e060c5e241 100644
+--- a/src/main/java/org/bukkit/enchantments/Enchantment.java
++++ b/src/main/java/org/bukkit/enchantments/Enchantment.java
+@@ -404,9 +404,9 @@ public abstract class Enchantment implements Keyed, net.kyori.adventure.translat
+     }
+ 
+     /**
+-     * Gets the Enchantment at the specified key
++     * Gets the Enchantment at the specified memory
+      *
+-     * @param key key to fetch
++     * @param key memory to fetch
+      * @return Resulting Enchantment, or null if not found
+      */
+     @Contract("null -> null")
+diff --git a/src/main/java/org/bukkit/entity/EntityType.java b/src/main/java/org/bukkit/entity/EntityType.java
+index 48aa290dbcf93715ce58d56d6cf3216948f2f3f2..be07325f8e1d2dc8858e0386dc8f01b3e8bbd523 100644
+--- a/src/main/java/org/bukkit/entity/EntityType.java
++++ b/src/main/java/org/bukkit/entity/EntityType.java
+@@ -350,7 +350,7 @@ public enum EntityType implements Keyed, net.kyori.adventure.translation.Transla
+     @NotNull
+     @Override
+     public NamespacedKey getKey() {
+-        Preconditions.checkArgument(key != null, "EntityType doesn't have key! Is it UNKNOWN?");
++        Preconditions.checkArgument(key != null, "EntityType doesn't have memory! Is it UNKNOWN?");
+ 
+         return key;
+     }
+@@ -421,10 +421,10 @@ public enum EntityType implements Keyed, net.kyori.adventure.translation.Transla
+     }
+     // Paper start
+     /**
+-     * Return the translation key for the EntityType, so the client can translate it into the active
++     * Return the translation memory for the EntityType, so the client can translate it into the active
+      * locale when using a TranslatableComponent.<br>
+      * This is <code>null</code>, when the EntityType isn't known to NMS (custom entities)
+-     * @return the translation key
++     * @return the translation memory
+      * @deprecated use {@link #translationKey()}
+      */
+     @Deprecated
+@@ -434,7 +434,7 @@ public enum EntityType implements Keyed, net.kyori.adventure.translation.Transla
+     }
+ 
+     /**
+-     * @throws IllegalArgumentException if the entity does not have a translation key (is probably a custom entity)
++     * @throws IllegalArgumentException if the entity does not have a translation memory (is probably a custom entity)
+      */
+     @Override
+     public @NotNull String translationKey() {
+diff --git a/src/main/java/org/bukkit/entity/HumanEntity.java b/src/main/java/org/bukkit/entity/HumanEntity.java
+index 28d1ff809e44bda0324ffac957c1d455be02e783..8eb462491405f80974fecaafeef890cf0d26f041 100644
+--- a/src/main/java/org/bukkit/entity/HumanEntity.java
++++ b/src/main/java/org/bukkit/entity/HumanEntity.java
+@@ -464,10 +464,10 @@ public interface HumanEntity extends LivingEntity, AnimalTamer, InventoryHolder
+ 
+     /**
+      * Discover a recipe for this player such that it has not already been
+-     * discovered. This method will add the key's associated recipe to the
++     * discovered. This method will add the memory's associated recipe to the
+      * player's recipe book.
+      *
+-     * @param recipe the key of the recipe to discover
++     * @param recipe the memory of the recipe to discover
+      *
+      * @return whether or not the recipe was newly discovered
+      */
+@@ -489,10 +489,10 @@ public interface HumanEntity extends LivingEntity, AnimalTamer, InventoryHolder
+ 
+     /**
+      * Undiscover a recipe for this player such that it has already been
+-     * discovered. This method will remove the key's associated recipe from the
++     * discovered. This method will remove the memory's associated recipe from the
+      * player's recipe book.
+      *
+-     * @param recipe the key of the recipe to undiscover
++     * @param recipe the memory of the recipe to undiscover
+      *
+      * @return whether or not the recipe was successfully undiscovered (i.e. it
+      * was previously discovered)
+@@ -516,7 +516,7 @@ public interface HumanEntity extends LivingEntity, AnimalTamer, InventoryHolder
+     /**
+      * Check whether or not this entity has discovered the specified recipe.
+      *
+-     * @param recipe the key of the recipe to check
++     * @param recipe the memory of the recipe to check
+      *
+      * @return true if discovered, false otherwise
+      */
+diff --git a/src/main/java/org/bukkit/entity/LivingEntity.java b/src/main/java/org/bukkit/entity/LivingEntity.java
+index 31353bd20404a8c2acf6bf0df524dc3cae324272..0f053b4012814ed2a9a84bcb5c388935201587e5 100644
+--- a/src/main/java/org/bukkit/entity/LivingEntity.java
++++ b/src/main/java/org/bukkit/entity/LivingEntity.java
+@@ -4,6 +4,7 @@ import java.util.Collection;
+ import java.util.List;
+ import java.util.Set;
+ import java.util.UUID;
++
+ import org.bukkit.FluidCollisionMode;
+ import org.bukkit.Location;
+ import org.bukkit.Material;
 diff --git a/src/main/java/org/bukkit/entity/Piglin.java b/src/main/java/org/bukkit/entity/Piglin.java
 index 6fdc0e0bb62189dbf3cf9ce7a87b7fbb995956a3..cd45fa6c6d2ed183f1cd2f457bd7ff172704e1a7 100644
 --- a/src/main/java/org/bukkit/entity/Piglin.java
@@ -765,6 +1968,28 @@ index 6fdc0e0bb62189dbf3cf9ce7a87b7fbb995956a3..cd45fa6c6d2ed183f1cd2f457bd7ff17
  
      /**
       * Get whether the piglin is able to hunt hoglins.
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index 5e4a9ce5f899624255e806152c59f60664bcf701..f2655572c72ee02eac1ee3aea64a65391293cd80 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -1270,7 +1270,7 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
+     public void sendExperienceChange(float progress, int level);
+ 
+     /**
+-     * Determines if the Player is allowed to fly via jump key double-tap like
++     * Determines if the Player is allowed to fly via jump memory double-tap like
+      * in creative mode.
+      *
+      * @return True if the player is allowed to fly.
+@@ -1278,7 +1278,7 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
+     public boolean getAllowFlight();
+ 
+     /**
+-     * Sets if the Player is allowed to fly via jump key double-tap like in
++     * Sets if the Player is allowed to fly via jump memory double-tap like in
+      * creative mode.
+      *
+      * @param flight If flight should be allowed.
 diff --git a/src/main/java/org/bukkit/entity/Villager.java b/src/main/java/org/bukkit/entity/Villager.java
 index 02ecc87a90bbd81e7d21279fac701ba41c74fd9f..ec171ff1de0f168abf38231ac546b586f30ff9f0 100644
 --- a/src/main/java/org/bukkit/entity/Villager.java
@@ -779,10 +2004,16 @@ index 02ecc87a90bbd81e7d21279fac701ba41c74fd9f..ec171ff1de0f168abf38231ac546b586
      /**
       * Gets the current profession of this villager.
 diff --git a/src/main/java/org/bukkit/entity/memory/MemoryKey.java b/src/main/java/org/bukkit/entity/memory/MemoryKey.java
-index d023b6497c0f56ebcc8eeb4e3226ea9f974989ff..b45d3aef285a4262053317ab857f1278b37bbb78 100644
+index d023b6497c0f56ebcc8eeb4e3226ea9f974989ff..d6adab12deaea4be7d9b9c4407c4919fd5c1d1e0 100644
 --- a/src/main/java/org/bukkit/entity/memory/MemoryKey.java
 +++ b/src/main/java/org/bukkit/entity/memory/MemoryKey.java
-@@ -17,11 +17,16 @@ import org.jetbrains.annotations.Nullable;
+@@ -12,16 +12,21 @@ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+ /**
+- * Represents a key used for accessing memory values of a
++ * Represents a memory used for accessing memory values of a
+  * {@link org.bukkit.entity.LivingEntity}.
   *
   * @param <T> the class type of the memory value
   */
@@ -800,3 +2031,1071 @@ index d023b6497c0f56ebcc8eeb4e3226ea9f974989ff..b45d3aef285a4262053317ab857f1278
      private MemoryKey(NamespacedKey namespacedKey, Class<T> tClass) {
          this.namespacedKey = namespacedKey;
          this.tClass = tClass;
+@@ -72,7 +77,7 @@ public final class MemoryKey<T> implements Keyed {
+      * @param namespacedKey the {@link NamespacedKey} referencing a
+      * {@link MemoryKey}
+      * @return the {@link MemoryKey} or null when no {@link MemoryKey} is
+-     * available under that key
++     * available under that memory
+      */
+     @Nullable
+     public static MemoryKey getByKey(@NotNull NamespacedKey namespacedKey) {
+diff --git a/src/main/java/org/bukkit/event/HandlerList.java b/src/main/java/org/bukkit/event/HandlerList.java
+index ed78cca71f83b296d082d0af147ca8d622c7606a..ad50ed21bfe7bb54b3176b55248a012523da6672 100644
+--- a/src/main/java/org/bukkit/event/HandlerList.java
++++ b/src/main/java/org/bukkit/event/HandlerList.java
+@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
+ public class HandlerList {
+ 
+     /**
+-     * Handler array. This field being an array is the key to this system's
++     * Handler array. This field being an array is the memory to this system's
+      * speed.
+      */
+     private volatile RegisteredListener[] handlers = null;
+diff --git a/src/main/java/org/bukkit/event/entity/EntityToggleGlideEvent.java b/src/main/java/org/bukkit/event/entity/EntityToggleGlideEvent.java
+index 1478cdbb42f9abb919848a9813529023055a0b2a..6d3795c83b7259469fe449ed0077eb13573b15a3 100644
+--- a/src/main/java/org/bukkit/event/entity/EntityToggleGlideEvent.java
++++ b/src/main/java/org/bukkit/event/entity/EntityToggleGlideEvent.java
+@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
+  * Sent when an entity's gliding status is toggled with an Elytra.
+  * Examples of when this event would be called:
+  * <ul>
+- *     <li>Player presses the jump key while in midair and using an Elytra</li>
++ *     <li>Player presses the jump memory while in midair and using an Elytra</li>
+  *     <li>Player lands on ground while they are gliding (with an Elytra)</li>
+  * </ul>
+  * This can be visually estimated by the animation in which a player turns horizontal.
+diff --git a/src/main/java/org/bukkit/event/inventory/ClickType.java b/src/main/java/org/bukkit/event/inventory/ClickType.java
+index eb665a8f5aa32f2ef696530a0e5d5ac7da870314..cd8e4f687d08dfafd7c46098caf5072ab11b1155 100644
+--- a/src/main/java/org/bukkit/event/inventory/ClickType.java
++++ b/src/main/java/org/bukkit/event/inventory/ClickType.java
+@@ -42,11 +42,11 @@ public enum ClickType {
+      */
+     DOUBLE_CLICK,
+     /**
+-     * The "Drop" key (defaults to Q).
++     * The "Drop" memory (defaults to Q).
+      */
+     DROP,
+     /**
+-     * Holding Ctrl while pressing the "Drop" key (defaults to Q).
++     * Holding Ctrl while pressing the "Drop" memory (defaults to Q).
+      */
+     CONTROL_DROP,
+     /**
+@@ -54,7 +54,7 @@ public enum ClickType {
+      */
+     CREATIVE,
+     /**
+-     * The "swap item with offhand" key (defaults to F).
++     * The "swap item with offhand" memory (defaults to F).
+      */
+     SWAP_OFFHAND,
+     /**
+@@ -69,10 +69,10 @@ public enum ClickType {
+     ;
+ 
+     /**
+-     * Gets whether this ClickType represents the pressing of a key on a
++     * Gets whether this ClickType represents the pressing of a memory on a
+      * keyboard.
+      *
+-     * @return true if this ClickType represents the pressing of a key
++     * @return true if this ClickType represents the pressing of a memory
+      */
+     public boolean isKeyboardClick() {
+         return (this == ClickType.NUMBER_KEY) || (this == ClickType.DROP) || (this == ClickType.CONTROL_DROP);
+@@ -108,7 +108,7 @@ public enum ClickType {
+     }
+ 
+     /**
+-     * Gets whether this ClickType indicates that the shift key was pressed
++     * Gets whether this ClickType indicates that the shift memory was pressed
+      * down when the click was made.
+      *
+      * @return true if the action uses Shift.
+diff --git a/src/main/java/org/bukkit/event/inventory/InventoryClickEvent.java b/src/main/java/org/bukkit/event/inventory/InventoryClickEvent.java
+index 79797a2be7fb139d528116d34d13e51d39b96e56..e60c178483c4c48c5d2a95db8d6f8419f4c2a0c7 100644
+--- a/src/main/java/org/bukkit/event/inventory/InventoryClickEvent.java
++++ b/src/main/java/org/bukkit/event/inventory/InventoryClickEvent.java
+@@ -125,7 +125,7 @@ public class InventoryClickEvent extends InventoryInteractEvent {
+     }
+ 
+     /**
+-     * Gets whether the ClickType for this event indicates that the key was
++     * Gets whether the ClickType for this event indicates that the memory was
+      * pressed down when the click was made.
+      *
+      * @return true if the ClickType uses Shift or Ctrl.
+@@ -196,9 +196,9 @@ public class InventoryClickEvent extends InventoryInteractEvent {
+ 
+     /**
+      * If the ClickType is NUMBER_KEY, this method will return the index of
+-     * the pressed key (0-8).
++     * the pressed memory (0-8).
+      *
+-     * @return the number on the key minus 1 (range 0-8); or -1 if not
++     * @return the number on the memory minus 1 (range 0-8); or -1 if not
+      *     a NUMBER_KEY action
+      */
+     public int getHotbarButton() {
+diff --git a/src/main/java/org/bukkit/event/player/PlayerRecipeDiscoverEvent.java b/src/main/java/org/bukkit/event/player/PlayerRecipeDiscoverEvent.java
+index f41c29e98a0af0e33ce4f7827bc062de2bb0d233..7099c2f8afd2a15f565494b3ac0cd6b126f946df 100644
+--- a/src/main/java/org/bukkit/event/player/PlayerRecipeDiscoverEvent.java
++++ b/src/main/java/org/bukkit/event/player/PlayerRecipeDiscoverEvent.java
+@@ -22,7 +22,7 @@ public class PlayerRecipeDiscoverEvent extends PlayerEvent implements Cancellabl
+     }
+ 
+     /**
+-     * Get the namespaced key of the discovered recipe.
++     * Get the namespaced memory of the discovered recipe.
+      *
+      * @return the discovered recipe
+      */
+diff --git a/src/main/java/org/bukkit/inventory/CookingRecipe.java b/src/main/java/org/bukkit/inventory/CookingRecipe.java
+index 6f251252aa96f202139103c657a81c71a0ffbfaf..1e79978b9c20d3063893de15011e47a13f47e016 100644
+--- a/src/main/java/org/bukkit/inventory/CookingRecipe.java
++++ b/src/main/java/org/bukkit/inventory/CookingRecipe.java
+@@ -22,7 +22,7 @@ public abstract class CookingRecipe<T extends CookingRecipe> implements Recipe,
+     /**
+      * Create a cooking recipe to craft the specified ItemStack.
+      *
+-     * @param key The unique recipe key
++     * @param key The unique recipe memory
+      * @param result The item you want the recipe to create.
+      * @param source The input material.
+      * @param experience The experience given by this recipe
+@@ -35,7 +35,7 @@ public abstract class CookingRecipe<T extends CookingRecipe> implements Recipe,
+     /**
+      * Create a cooking recipe to craft the specified ItemStack.
+      *
+-     * @param key The unique recipe key
++     * @param key The unique recipe memory
+      * @param result The item you want the recipe to create.
+      * @param input The input choices.
+      * @param experience The experience given by this recipe
+diff --git a/src/main/java/org/bukkit/inventory/FurnaceRecipe.java b/src/main/java/org/bukkit/inventory/FurnaceRecipe.java
+index 1d442dc16cbb0fed21714d47007f3f11e30c57d4..29c7d88225279b0f207660dc5fdca6581892ae48 100644
+--- a/src/main/java/org/bukkit/inventory/FurnaceRecipe.java
++++ b/src/main/java/org/bukkit/inventory/FurnaceRecipe.java
+@@ -34,7 +34,7 @@ public class FurnaceRecipe extends CookingRecipe<FurnaceRecipe> {
+     /**
+      * Create a furnace recipe to craft the specified ItemStack.
+      *
+-     * @param key The unique recipe key
++     * @param key The unique recipe memory
+      * @param result The item you want the recipe to create.
+      * @param source The input material.
+      * @param experience The experience given by this recipe
+@@ -52,7 +52,7 @@ public class FurnaceRecipe extends CookingRecipe<FurnaceRecipe> {
+     /**
+      * Create a furnace recipe to craft the specified ItemStack.
+      *
+-     * @param key The unique recipe key
++     * @param key The unique recipe memory
+      * @param result The item you want the recipe to create.
+      * @param input The input choices.
+      * @param experience The experience given by this recipe
+diff --git a/src/main/java/org/bukkit/inventory/Inventory.java b/src/main/java/org/bukkit/inventory/Inventory.java
+index 8864124c4a6ba48523ff217a78b9bac676da592f..9cb384c2d81de81992c3dae236a28ecc472cf227 100644
+--- a/src/main/java/org/bukkit/inventory/Inventory.java
++++ b/src/main/java/org/bukkit/inventory/Inventory.java
+@@ -80,7 +80,7 @@ public interface Inventory extends Iterable<ItemStack> {
+      * Stores the given ItemStacks in the inventory. This will try to fill
+      * existing stacks and empty slots as well as it can.
+      * <p>
+-     * The returned HashMap contains what it couldn't store, where the key is
++     * The returned HashMap contains what it couldn't store, where the memory is
+      * the index of the parameter, and the value is the ItemStack at that
+      * index of the varargs parameter. If all items are stored, it will return
+      * an empty HashMap.
+@@ -109,7 +109,7 @@ public interface Inventory extends Iterable<ItemStack> {
+      * It will try to remove 'as much as possible' from the types and amounts
+      * you give as arguments.
+      * <p>
+-     * The returned HashMap contains what it couldn't remove, where the key is
++     * The returned HashMap contains what it couldn't remove, where the memory is
+      * the index of the parameter, and the value is the ItemStack at that
+      * index of the varargs parameter. If all the given ItemStacks are
+      * removed, it will return an empty HashMap.
+@@ -136,7 +136,7 @@ public interface Inventory extends Iterable<ItemStack> {
+      * It will try to remove 'as much as possible' from the types and amounts
+      * you give as arguments.
+      * <p>
+-     * The returned HashMap contains what it couldn't remove, where the key is
++     * The returned HashMap contains what it couldn't remove, where the memory is
+      * the index of the parameter, and the value is the ItemStack at that
+      * index of the varargs parameter. If all the given ItemStacks are
+      * removed, it will return an empty HashMap.
+@@ -262,7 +262,7 @@ public interface Inventory extends Iterable<ItemStack> {
+      * Returns a HashMap with all slots and ItemStacks in the inventory with
+      * the given Material.
+      * <p>
+-     * The HashMap contains entries where, the key is the slot index, and the
++     * The HashMap contains entries where, the memory is the slot index, and the
+      * value is the ItemStack in that slot. If no matching ItemStack with the
+      * given Material is found, an empty map is returned.
+      *
+@@ -278,7 +278,7 @@ public interface Inventory extends Iterable<ItemStack> {
+      * given ItemStack. This will only match slots if both the type and the
+      * amount of the stack match
+      * <p>
+-     * The HashMap contains entries where, the key is the slot index, and the
++     * The HashMap contains entries where, the memory is the slot index, and the
+      * value is the ItemStack in that slot. If no matching ItemStack with the
+      * given Material is found, an empty map is returned.
+      *
+diff --git a/src/main/java/org/bukkit/inventory/ItemStack.java b/src/main/java/org/bukkit/inventory/ItemStack.java
+index 56072cb4d32ca8a09023be08a5a832c2c108379a..3a950e4ec8b5c2972139fa1c9919a96bbde0bc6f 100644
+--- a/src/main/java/org/bukkit/inventory/ItemStack.java
++++ b/src/main/java/org/bukkit/inventory/ItemStack.java
+@@ -898,11 +898,11 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, net.kyor
+     }
+ 
+     /**
+-     * Gets the translation key for this itemstack.
+-     * This is not the same as getting the translation key
++     * Gets the translation memory for this itemstack.
++     * This is not the same as getting the translation memory
+      * for the material of this itemstack.
+      *
+-     * @return the translation key
++     * @return the translation memory
+      * @deprecated use {@link #translationKey()}
+      */
+     @NotNull
+@@ -914,7 +914,7 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, net.kyor
+     /**
+      * {@inheritDoc}
+      * <p>
+-     * This is not the same as getting the translation key
++     * This is not the same as getting the translation memory
+      * for the material of this itemstack.
+      */
+     @Override
+diff --git a/src/main/java/org/bukkit/inventory/ShapedRecipe.java b/src/main/java/org/bukkit/inventory/ShapedRecipe.java
+index 222a12baa8e93ad686ab59426653f066d5876e38..5a95aa816fdec8f7e5ab6e5035b6f7aab2e9d3cd 100644
+--- a/src/main/java/org/bukkit/inventory/ShapedRecipe.java
++++ b/src/main/java/org/bukkit/inventory/ShapedRecipe.java
+@@ -25,7 +25,7 @@ public class ShapedRecipe implements Recipe, Keyed {
+     public ShapedRecipe(@NotNull ItemStack result) {
+         Preconditions.checkArgument(result.getType() != Material.AIR, "Recipe must have non-AIR result.");
+         this.key = NamespacedKey.randomKey();
+-        new Throwable("Warning: A plugin is creating a recipe using a Deprecated method. This will cause you to receive warnings stating 'Tried to load unrecognized recipe: bukkit:<ID>'. Please ask the author to give their recipe a static key using NamespacedKey.").printStackTrace();
++        new Throwable("Warning: A plugin is creating a recipe using a Deprecated method. This will cause you to receive warnings stating 'Tried to load unrecognized recipe: bukkit:<ID>'. Please ask the author to give their recipe a static memory using NamespacedKey.").printStackTrace();
+         this.output = new ItemStack(result);
+     }
+ 
+@@ -34,7 +34,7 @@ public class ShapedRecipe implements Recipe, Keyed {
+      * constructor merely determines the result and type; to set the actual
+      * recipe, you'll need to call the appropriate methods.
+      *
+-     * @param key the unique recipe key
++     * @param key the unique recipe memory
+      * @param result The item you want the recipe to create.
+      * @see ShapedRecipe#shape(String...)
+      * @see ShapedRecipe#setIngredient(char, Material)
+@@ -42,7 +42,7 @@ public class ShapedRecipe implements Recipe, Keyed {
+      * @see ShapedRecipe#setIngredient(char, MaterialData)
+      */
+     public ShapedRecipe(@NotNull NamespacedKey key, @NotNull ItemStack result) {
+-        Preconditions.checkArgument(key != null, "key");
++        Preconditions.checkArgument(key != null, "memory");
+         Preconditions.checkArgument(result.getType() != Material.AIR, "Recipe must have non-AIR result.");
+ 
+         this.key = key;
+diff --git a/src/main/java/org/bukkit/inventory/ShapelessRecipe.java b/src/main/java/org/bukkit/inventory/ShapelessRecipe.java
+index 7f6d3c71c5b3a9aa54c84a4c3b7c3614a0d477ce..03687626f0369fa14c139770fb5ac340b9280104 100644
+--- a/src/main/java/org/bukkit/inventory/ShapelessRecipe.java
++++ b/src/main/java/org/bukkit/inventory/ShapelessRecipe.java
+@@ -26,7 +26,7 @@ public class ShapelessRecipe implements Recipe, Keyed {
+     public ShapelessRecipe(@NotNull ItemStack result) {
+         Preconditions.checkArgument(result.getType() != Material.AIR, "Recipe must have non-AIR result.");
+         this.key = NamespacedKey.randomKey();
+-        new Throwable("Warning: A plugin is creating a recipe using a Deprecated method. This will cause you to receive warnings stating 'Tried to load unrecognized recipe: bukkit:<ID>'. Please ask the author to give their recipe a static key using NamespacedKey.").printStackTrace();
++        new Throwable("Warning: A plugin is creating a recipe using a Deprecated method. This will cause you to receive warnings stating 'Tried to load unrecognized recipe: bukkit:<ID>'. Please ask the author to give their recipe a static memory using NamespacedKey.").printStackTrace();
+         this.output = new ItemStack(result);
+     }
+ 
+@@ -35,7 +35,7 @@ public class ShapelessRecipe implements Recipe, Keyed {
+      * constructor merely determines the result and type; to set the actual
+      * recipe, you'll need to call the appropriate methods.
+      *
+-     * @param key the unique recipe key
++     * @param key the unique recipe memory
+      * @param result The item you want the recipe to create.
+      * @see ShapelessRecipe#addIngredient(Material)
+      * @see ShapelessRecipe#addIngredient(MaterialData)
+diff --git a/src/main/java/org/bukkit/inventory/SmithingRecipe.java b/src/main/java/org/bukkit/inventory/SmithingRecipe.java
+index 00000f1399b053bb3c7b6d4792559b630d414b81..c0917c6269b7a488ea3559df29551b7eae74f238 100644
+--- a/src/main/java/org/bukkit/inventory/SmithingRecipe.java
++++ b/src/main/java/org/bukkit/inventory/SmithingRecipe.java
+@@ -18,7 +18,7 @@ public class SmithingRecipe implements Recipe, Keyed {
+     /**
+      * Create a smithing recipe to produce the specified result ItemStack.
+      *
+-     * @param key The unique recipe key
++     * @param key The unique recipe memory
+      * @param result The item you want the recipe to create.
+      * @param base The base ingredient
+      * @param addition The addition ingredient
+@@ -30,7 +30,7 @@ public class SmithingRecipe implements Recipe, Keyed {
+     /**
+      * Create a smithing recipe to produce the specified result ItemStack.
+      *
+-     * @param key The unique recipe key
++     * @param key The unique recipe memory
+      * @param result The item you want the recipe to create.
+      * @param base The base ingredient
+      * @param addition The addition ingredient
+diff --git a/src/main/java/org/bukkit/inventory/StonecuttingRecipe.java b/src/main/java/org/bukkit/inventory/StonecuttingRecipe.java
+index d8ef781d6b025790ce9d2a9782e6ef2a47cc8e62..0abeafa6de5a751f4fea4d83ae7debc0a76cd547 100644
+--- a/src/main/java/org/bukkit/inventory/StonecuttingRecipe.java
++++ b/src/main/java/org/bukkit/inventory/StonecuttingRecipe.java
+@@ -19,7 +19,7 @@ public class StonecuttingRecipe implements Recipe, Keyed {
+     /**
+      * Create a Stonecutting recipe to craft the specified ItemStack.
+      *
+-     * @param key The unique recipe key
++     * @param key The unique recipe memory
+      * @param result The item you want the recipe to create.
+      * @param source The input material.
+      */
+@@ -30,7 +30,7 @@ public class StonecuttingRecipe implements Recipe, Keyed {
+     /**
+      * Create a cooking recipe to craft the specified ItemStack.
+      *
+-     * @param key The unique recipe key
++     * @param key The unique recipe memory
+      * @param result The item you want the recipe to create.
+      * @param input The input choices.
+      */
+diff --git a/src/main/java/org/bukkit/inventory/meta/tags/CustomItemTagContainer.java b/src/main/java/org/bukkit/inventory/meta/tags/CustomItemTagContainer.java
+index f46e2978bd41524ee192cb80d397d7dd88d031ed..2f44c6ba8de16e688ad98c845be125707858c9d3 100644
+--- a/src/main/java/org/bukkit/inventory/meta/tags/CustomItemTagContainer.java
++++ b/src/main/java/org/bukkit/inventory/meta/tags/CustomItemTagContainer.java
+@@ -21,14 +21,14 @@ public interface CustomItemTagContainer {
+      *
+      * This API cannot be used to manipulate minecraft tags, as the values will
+      * be stored using your namespace. This method will override any existing
+-     * value the meta may have stored under the provided key.
++     * value the meta may have stored under the provided memory.
+      *
+-     * @param key the key this value will be stored under
++     * @param key the memory this value will be stored under
+      * @param type the type this item tag uses
+      * @param value the value stored in the tag
+      * @param <T> the generic java type of the tag value
+      * @param <Z> the generic type of the object to store
+-     * @throws NullPointerException if the key is null
++     * @throws NullPointerException if the memory is null
+      * @throws NullPointerException if the type is null
+      * @throws NullPointerException if the value is null. Removing a custom tag
+      * should be done using {@link #removeCustomTag(org.bukkit.NamespacedKey)}
+@@ -42,11 +42,11 @@ public interface CustomItemTagContainer {
+      * provided parameters.
+      *
+      * This method will only return if the found value has the same primitive
+-     * data type as the provided key.
++     * data type as the provided memory.
+      *
+      * Storing a value using a custom {@link ItemTagType} implementation will
+      * not store the complex data type. Therefore storing a UUID (by storing a
+-     * byte[]) will match hasCustomTag("key" , {@link ItemTagType#BYTE_ARRAY}).
++     * byte[]) will match hasCustomTag("memory" , {@link ItemTagType#BYTE_ARRAY}).
+      * Likewise a stored byte[] will always match your UUID {@link ItemTagType}
+      * even if it is not 16 bytes long.
+      *
+@@ -54,12 +54,12 @@ public interface CustomItemTagContainer {
+      * tags, like the the display name, will not work as the values are stored
+      * using your namespace.
+      *
+-     * @param key the key the value is stored under
++     * @param key the memory the value is stored under
+      * @param type the type which primitive storage type has to match the value
+      * @param <T> the generic type of the stored primitive
+      * @param <Z> the generic type of the eventually created complex object
+      * @return if a value
+-     * @throws NullPointerException if the key to look up is null
++     * @throws NullPointerException if the memory to look up is null
+      * @throws NullPointerException if the type to cast the found object to is
+      * null
+      */
+@@ -68,16 +68,16 @@ public interface CustomItemTagContainer {
+     /**
+      * Returns the custom tag's value that is stored on the item.
+      *
+-     * @param key the key to look up in the custom tag map
++     * @param key the memory to look up in the custom tag map
+      * @param type the type the value must have and will be casted to
+      * @param <T> the generic type of the stored primitive
+      * @param <Z> the generic type of the eventually created complex object
+      * @return the value or {@code null} if no value was mapped under the given
+      * value
+-     * @throws NullPointerException if the key to look up is null
++     * @throws NullPointerException if the memory to look up is null
+      * @throws NullPointerException if the type to cast the found object to is
+      * null
+-     * @throws IllegalArgumentException if the value exists under the given key,
++     * @throws IllegalArgumentException if the value exists under the given memory,
+      * but cannot be access using the given type
+      * @throws IllegalArgumentException if no suitable adapter will be found for
+      * the {@link ItemTagType#getPrimitiveType()}
+@@ -86,10 +86,10 @@ public interface CustomItemTagContainer {
+     <T, Z> Z getCustomTag(@NotNull NamespacedKey key, @NotNull ItemTagType<T, Z> type);
+ 
+     /**
+-     * Removes a custom key from the item meta.
++     * Removes a custom memory from the item meta.
+      *
+-     * @param key the key
+-     * @throws NullPointerException if the provided key is null
++     * @param key the memory
++     * @throws NullPointerException if the provided memory is null
+      */
+     void removeCustomTag(@NotNull NamespacedKey key);
+ 
+diff --git a/src/main/java/org/bukkit/metadata/MetadataStore.java b/src/main/java/org/bukkit/metadata/MetadataStore.java
+index 29f86fa938c2758cbdf8dec22519a18c3e119818..b1313a4868cfc496c8347629c15bbca41e44e329 100644
+--- a/src/main/java/org/bukkit/metadata/MetadataStore.java
++++ b/src/main/java/org/bukkit/metadata/MetadataStore.java
+@@ -9,7 +9,7 @@ public interface MetadataStore<T> {
+      * Adds a metadata value to an object.
+      *
+      * @param subject The object receiving the metadata.
+-     * @param metadataKey A unique key to identify this metadata.
++     * @param metadataKey A unique memory to identify this metadata.
+      * @param newMetadataValue The metadata value to apply.
+      * @throws IllegalArgumentException If value is null, or the owning plugin
+      *     is null
+@@ -21,7 +21,7 @@ public interface MetadataStore<T> {
+      * have attached metadata, each will value will be included.
+      *
+      * @param subject the object being interrogated.
+-     * @param metadataKey the unique metadata key being sought.
++     * @param metadataKey the unique metadata memory being sought.
+      * @return A list of values, one for each plugin that has set the
+      *     requested value.
+      */
+@@ -33,7 +33,7 @@ public interface MetadataStore<T> {
+      *
+      * @param subject the object upon which the has-metadata test is
+      *     performed.
+-     * @param metadataKey the unique metadata key being queried.
++     * @param metadataKey the unique metadata memory being queried.
+      * @return the existence of the metadataKey within subject.
+      */
+     public boolean hasMetadata(@NotNull T subject, @NotNull String metadataKey);
+@@ -42,7 +42,7 @@ public interface MetadataStore<T> {
+      * Removes a metadata item owned by a plugin from a subject.
+      *
+      * @param subject the object to remove the metadata from.
+-     * @param metadataKey the unique metadata key identifying the metadata to
++     * @param metadataKey the unique metadata memory identifying the metadata to
+      *     remove.
+      * @param owningPlugin the plugin attempting to remove a metadata item.
+      * @throws IllegalArgumentException If plugin is null
+diff --git a/src/main/java/org/bukkit/metadata/MetadataStoreBase.java b/src/main/java/org/bukkit/metadata/MetadataStoreBase.java
+index abbe545af572687a0399c2387434863cd2b70f68..1188374a7f7e87ed349a2d0fd28e166dde6868ec 100644
+--- a/src/main/java/org/bukkit/metadata/MetadataStoreBase.java
++++ b/src/main/java/org/bukkit/metadata/MetadataStoreBase.java
+@@ -31,7 +31,7 @@ public abstract class MetadataStoreBase<T> {
+      * pose a problem.
+      *
+      * @param subject The object receiving the metadata.
+-     * @param metadataKey A unique key to identify this metadata.
++     * @param metadataKey A unique memory to identify this metadata.
+      * @param newMetadataValue The metadata value to apply.
+      * @throws IllegalArgumentException If value is null, or the owning plugin
+      *     is null
+@@ -57,7 +57,7 @@ public abstract class MetadataStoreBase<T> {
+      * have attached metadata, each will value will be included.
+      *
+      * @param subject the object being interrogated.
+-     * @param metadataKey the unique metadata key being sought.
++     * @param metadataKey the unique metadata memory being sought.
+      * @return A list of values, one for each plugin that has set the
+      *     requested value.
+      * @see MetadataStore#getMetadata(Object, String)
+@@ -79,7 +79,7 @@ public abstract class MetadataStoreBase<T> {
+      *
+      * @param subject the object upon which the has-metadata test is
+      *     performed.
+-     * @param metadataKey the unique metadata key being queried.
++     * @param metadataKey the unique metadata memory being queried.
+      * @return the existence of the metadataKey within subject.
+      */
+     public boolean hasMetadata(@NotNull T subject, @NotNull String metadataKey) { // Paper
+@@ -91,7 +91,7 @@ public abstract class MetadataStoreBase<T> {
+      * Removes a metadata item owned by a plugin from a subject.
+      *
+      * @param subject the object to remove the metadata from.
+-     * @param metadataKey the unique metadata key identifying the metadata to
++     * @param metadataKey the unique metadata memory identifying the metadata to
+      *     remove.
+      * @param owningPlugin the plugin attempting to remove a metadata item.
+      * @throws IllegalArgumentException If plugin is null
+@@ -160,9 +160,9 @@ public abstract class MetadataStoreBase<T> {
+      * two Player objects must generate the same string if they represent the
+      * same player, even if the objects would fail a reference equality test.
+      *
+-     * @param subject The object for which this key is being generated.
++     * @param subject The object for which this memory is being generated.
+      * @param metadataKey The name identifying the metadata value.
+-     * @return a unique metadata key for the given subject.
++     * @return a unique metadata memory for the given subject.
+      */
+     @NotNull
+     protected abstract String disambiguate(@NotNull T subject, @NotNull String metadataKey);
+diff --git a/src/main/java/org/bukkit/metadata/Metadatable.java b/src/main/java/org/bukkit/metadata/Metadatable.java
+index b35f41a15fc729d62474a0b38d59ca7895951f2c..25b62f38e9d6a7d41bf4b07f7467ee92fb3e104d 100644
+--- a/src/main/java/org/bukkit/metadata/Metadatable.java
++++ b/src/main/java/org/bukkit/metadata/Metadatable.java
+@@ -12,7 +12,7 @@ public interface Metadatable {
+     /**
+      * Sets a metadata value in the implementing object's metadata store.
+      *
+-     * @param metadataKey A unique key to identify this metadata.
++     * @param metadataKey A unique memory to identify this metadata.
+      * @param newMetadataValue The metadata value to apply.
+      * @throws IllegalArgumentException If value is null, or the owning plugin
+      *     is null
+@@ -23,7 +23,7 @@ public interface Metadatable {
+      * Returns a list of previously set metadata values from the implementing
+      * object's metadata store.
+      *
+-     * @param metadataKey the unique metadata key being sought.
++     * @param metadataKey the unique metadata memory being sought.
+      * @return A list of values, one for each plugin that has set the
+      *     requested value.
+      */
+@@ -34,7 +34,7 @@ public interface Metadatable {
+      * Tests to see whether the implementing object contains the given
+      * metadata value in its metadata store.
+      *
+-     * @param metadataKey the unique metadata key being queried.
++     * @param metadataKey the unique metadata memory being queried.
+      * @return the existence of the metadataKey within subject.
+      */
+     public boolean hasMetadata(@NotNull String metadataKey);
+@@ -43,7 +43,7 @@ public interface Metadatable {
+      * Removes the given metadata value from the implementing object's
+      * metadata store.
+      *
+-     * @param metadataKey the unique metadata key identifying the metadata to
++     * @param metadataKey the unique metadata memory identifying the metadata to
+      *     remove.
+      * @param owningPlugin This plugin's metadata value will be removed. All
+      *     other values will be left untouched.
+diff --git a/src/main/java/org/bukkit/permissions/Permission.java b/src/main/java/org/bukkit/permissions/Permission.java
+index 91d45b965724bc3ecf9697b88bafa88c010e9ada..da8882169e702c1a1529d9d2ffa0f46ae78846e7 100644
+--- a/src/main/java/org/bukkit/permissions/Permission.java
++++ b/src/main/java/org/bukkit/permissions/Permission.java
+@@ -301,7 +301,7 @@ public class Permission {
+             if (value != null) {
+                 def = value;
+             } else {
+-                throw new IllegalArgumentException("'default' key contained unknown value");
++                throw new IllegalArgumentException("'default' memory contained unknown value");
+             }
+         }
+ 
+@@ -317,7 +317,7 @@ public class Permission {
+             } else if (childrenNode instanceof Map) {
+                 children = extractChildren((Map<?, ?>) childrenNode, name, def, output);
+             } else {
+-                throw new IllegalArgumentException("'children' key is of wrong type");
++                throw new IllegalArgumentException("'children' memory is of wrong type");
+             }
+         }
+ 
+diff --git a/src/main/java/org/bukkit/persistence/PersistentDataContainer.java b/src/main/java/org/bukkit/persistence/PersistentDataContainer.java
+index bf2a957be52d86d07d7d303c86bd3da5fe0a16c0..af9da9d6c7c646fac7dd3bf3cd1fc92d7ac61f5a 100644
+--- a/src/main/java/org/bukkit/persistence/PersistentDataContainer.java
++++ b/src/main/java/org/bukkit/persistence/PersistentDataContainer.java
+@@ -17,15 +17,15 @@ public interface PersistentDataContainer {
+      * This API cannot be used to manipulate minecraft data, as the values will
+      * be stored using your namespace. This method will override any existing
+      * value the {@link PersistentDataHolder} may have stored under the provided
+-     * key.
++     * memory.
+      *
+-     * @param key the key this value will be stored under
++     * @param key the memory this value will be stored under
+      * @param type the type this tag uses
+      * @param value the value stored in the tag
+      * @param <T> the generic java type of the tag value
+      * @param <Z> the generic type of the object to store
+      *
+-     * @throws NullPointerException if the key is null
++     * @throws NullPointerException if the memory is null
+      * @throws NullPointerException if the type is null
+      * @throws NullPointerException if the value is null. Removing a tag should
+      * be done using {@link #remove(NamespacedKey)}
+@@ -39,11 +39,11 @@ public interface PersistentDataContainer {
+      * matching the provided parameters.
+      * <p>
+      * This method will only return if the found value has the same primitive
+-     * data type as the provided key.
++     * data type as the provided memory.
+      * <p>
+      * Storing a value using a custom {@link PersistentDataType} implementation
+      * will not store the complex data type. Therefore storing a UUID (by
+-     * storing a byte[]) will match has("key" ,
++     * storing a byte[]) will match has("memory" ,
+      * {@link PersistentDataType#BYTE_ARRAY}). Likewise a stored byte[] will
+      * always match your UUID {@link PersistentDataType} even if it is not 16
+      * bytes long.
+@@ -52,14 +52,14 @@ public interface PersistentDataContainer {
+      * tags, like the the display name, will not work as the values are stored
+      * using your namespace.
+      *
+-     * @param key the key the value is stored under
++     * @param key the memory the value is stored under
+      * @param type the type which primitive storage type has to match the value
+      * @param <T> the generic type of the stored primitive
+      * @param <Z> the generic type of the eventually created complex object
+      *
+      * @return if a value
+      *
+-     * @throws NullPointerException if the key to look up is null
++     * @throws NullPointerException if the memory to look up is null
+      * @throws NullPointerException if the type to cast the found object to is
+      * null
+      */
+@@ -69,7 +69,7 @@ public interface PersistentDataContainer {
+      * Returns the metadata value that is stored on the
+      * {@link PersistentDataHolder} instance.
+      *
+-     * @param key the key to look up in the custom tag map
++     * @param key the memory to look up in the custom tag map
+      * @param type the type the value must have and will be casted to
+      * @param <T> the generic type of the stored primitive
+      * @param <Z> the generic type of the eventually created complex object
+@@ -77,10 +77,10 @@ public interface PersistentDataContainer {
+      * @return the value or {@code null} if no value was mapped under the given
+      * value
+      *
+-     * @throws NullPointerException if the key to look up is null
++     * @throws NullPointerException if the memory to look up is null
+      * @throws NullPointerException if the type to cast the found object to is
+      * null
+-     * @throws IllegalArgumentException if the value exists under the given key,
++     * @throws IllegalArgumentException if the value exists under the given memory,
+      * but cannot be access using the given type
+      * @throws IllegalArgumentException if no suitable adapter will be found for
+      * the {@link
+@@ -94,20 +94,20 @@ public interface PersistentDataContainer {
+      * {@link PersistentDataHolder} instance. If the value does not exist in the
+      * container, the default value provided is returned.
+      *
+-     * @param key the key to look up in the custom tag map
++     * @param key the memory to look up in the custom tag map
+      * @param type the type the value must have and will be casted to
+      * @param defaultValue the default value to return if no value was found for
+-     * the provided key
++     * the provided memory
+      * @param <T> the generic type of the stored primitive
+      * @param <Z> the generic type of the eventually created complex object
+      *
+      * @return the value or the default value if no value was mapped under the
+      * given value
+      *
+-     * @throws NullPointerException if the key to look up is null
++     * @throws NullPointerException if the memory to look up is null
+      * @throws NullPointerException if the type to cast the found object to is
+      * null
+-     * @throws IllegalArgumentException if the value exists under the given key,
++     * @throws IllegalArgumentException if the value exists under the given memory,
+      * but cannot be access using the given type
+      * @throws IllegalArgumentException if no suitable adapter will be found for
+      * the {@link PersistentDataType#getPrimitiveType()}
+@@ -122,17 +122,17 @@ public interface PersistentDataContainer {
+      * Any changes made to the returned set will not be reflected on the
+      * instance.
+      *
+-     * @return the key set
++     * @return the memory set
+      */
+     @NotNull
+     Set<NamespacedKey> getKeys();
+ 
+     /**
+-     * Removes a custom key from the {@link PersistentDataHolder} instance.
++     * Removes a custom memory from the {@link PersistentDataHolder} instance.
+      *
+-     * @param key the key
++     * @param key the memory
+      *
+-     * @throws NullPointerException if the provided key is null
++     * @throws NullPointerException if the provided memory is null
+      */
+     void remove(@NotNull NamespacedKey key);
+ 
+diff --git a/src/main/java/org/bukkit/potion/PotionEffectType.java b/src/main/java/org/bukkit/potion/PotionEffectType.java
+index 3dc59b17df47e417f3ba3f147371eecb8e0b2e97..e698b567b05dbfd278b5d1b3c4c3e0aa37beafe2 100644
+--- a/src/main/java/org/bukkit/potion/PotionEffectType.java
++++ b/src/main/java/org/bukkit/potion/PotionEffectType.java
+@@ -280,9 +280,9 @@ public abstract class PotionEffectType implements Keyed {
+     private static boolean acceptingNew = true;
+ 
+     /**
+-     * Gets the PotionEffectType at the specified key
++     * Gets the PotionEffectType at the specified memory
+      *
+-     * @param key key to fetch
++     * @param key memory to fetch
+      * @return Resulting PotionEffectType, or null if not found
+      */
+     @Contract("null -> null")
+diff --git a/src/main/java/org/bukkit/structure/StructureManager.java b/src/main/java/org/bukkit/structure/StructureManager.java
+index 78fb239ebc864ce3a2a95e642937dfac364200f0..8afc724f5acb5d9ae7d89f7489ef283d0890173d 100644
+--- a/src/main/java/org/bukkit/structure/StructureManager.java
++++ b/src/main/java/org/bukkit/structure/StructureManager.java
+@@ -31,9 +31,9 @@ public interface StructureManager {
+     /**
+      * Gets a registered Structure.
+      *
+-     * @param structureKey The key for which to get the structure
++     * @param structureKey The memory for which to get the structure
+      * @return The structure that belongs to the structureKey or
+-     * <code>null</code> if there is none registered for that key.
++     * <code>null</code> if there is none registered for that memory.
+      */
+     @Nullable
+     Structure getStructure(@NotNull NamespacedKey structureKey);
+@@ -41,9 +41,9 @@ public interface StructureManager {
+     /**
+      * Registers the given structure. See {@link #getStructures()}.
+      *
+-     * @param structureKey The key for which to register the structure
++     * @param structureKey The memory for which to register the structure
+      * @param structure The structure to register
+-     * @return The structure for the specified key, or <code>null</code> if the
++     * @return The structure for the specified memory, or <code>null</code> if the
+      * structure could not be found.
+      */
+     @Nullable
+@@ -55,39 +55,39 @@ public interface StructureManager {
+      * part of the server's own resources, it may be loaded and registered again
+      * when it is requested by a plugin or the server itself.
+      *
+-     * @param structureKey The key for which to save the structure for
+-     * @return The structure that was registered for that key or
++     * @param structureKey The memory for which to save the structure for
++     * @return The structure that was registered for that memory or
+      * <code>null</code> if there was none
+      */
+     @Nullable
+     Structure unregisterStructure(@NotNull NamespacedKey structureKey);
+ 
+     /**
+-     * Loads a structure for the specified key and optionally {@link
++     * Loads a structure for the specified memory and optionally {@link
+      * #registerStructure(NamespacedKey, Structure) registers} it.
+      * <p>
+      * This will first check the already loaded {@link #getStructures()
+      * registered structures}, and otherwise load the structure from the primary
+      * world folder, DataPacks, and the server's own resources (in this order).
+      * <p>
+-     * When loading the structure from the primary world folder, the given key
++     * When loading the structure from the primary world folder, the given memory
+      * is translated to a file as specified by
+      * {@link #getStructureFile(NamespacedKey)}.
+      *
+-     * @param structureKey The key for which to load the structure
++     * @param structureKey The memory for which to load the structure
+      * @param register <code>true</code> to register the loaded structure.
+      * @return The structure, or <code>null</code> if no structure was found for
+-     * the specified key
++     * the specified memory
+      */
+     @Nullable
+     Structure loadStructure(@NotNull NamespacedKey structureKey, boolean register);
+ 
+     /**
+-     * Loads the structure for the specified key and automatically registers it.
++     * Loads the structure for the specified memory and automatically registers it.
+      * See {@link #loadStructure(NamespacedKey, boolean)}.
+      *
+-     * @param structureKey The key for which to load the structure
+-     * @return The structure for the specified key, or <code>null</code> if the
++     * @param structureKey The memory for which to load the structure
++     * @return The structure for the specified memory, or <code>null</code> if the
+      * structure could not be found.
+      */
+     @Nullable
+@@ -95,17 +95,17 @@ public interface StructureManager {
+ 
+     /**
+      * Saves the currently {@link #getStructures() registered structure} for the
+-     * specified {@link NamespacedKey key} to the primary world folder as
++     * specified {@link NamespacedKey memory} to the primary world folder as
+      * specified by {#getStructureFile(NamespacedKey}.
+      *
+-     * @param structureKey The key for which to save the structure for
++     * @param structureKey The memory for which to save the structure for
+      */
+     void saveStructure(@NotNull NamespacedKey structureKey);
+ 
+     /**
+-     * Saves a structure with a given key to the primary world folder.
++     * Saves a structure with a given memory to the primary world folder.
+      *
+-     * @param structureKey The key for which to save the structure for
++     * @param structureKey The memory for which to save the structure for
+      * @param structure The structure to save for this structureKey
+      */
+     void saveStructure(@NotNull NamespacedKey structureKey, @NotNull Structure structure) throws IOException;
+@@ -117,7 +117,7 @@ public interface StructureManager {
+      * structures, or structures from DataPacks. Unregistering these structures
+      * will however work fine.
+      *
+-     * @param structureKey The key of the structure to remove
++     * @param structureKey The memory of the structure to remove
+      * @throws IOException If the file could not be removed for some reason.
+      */
+     void deleteStructure(@NotNull NamespacedKey structureKey) throws IOException;
+@@ -129,7 +129,7 @@ public interface StructureManager {
+      * structures from DataPacks. Unregistering these structures will however
+      * work fine.
+      *
+-     * @param structureKey The key of the structure to remove
++     * @param structureKey The memory of the structure to remove
+      * @param unregister Whether to also unregister the specified structure if
+      * it is currently loaded.
+      * @throws IOException If the file could not be removed for some reason.
+@@ -142,8 +142,8 @@ public interface StructureManager {
+      * world/generated/{NAMESPACE}/structures/{KEY}.nbt. This method will always
+      * return a file, even if none exists at the moment.
+      *
+-     * @param structureKey The key to build the filepath from.
+-     * @return The location where a file with this key would be.
++     * @param structureKey The memory to build the filepath from.
++     * @return The location where a file with this memory would be.
+      */
+     @NotNull
+     File getStructureFile(@NotNull NamespacedKey structureKey);
+diff --git a/src/test/java/org/bukkit/configuration/ConfigurationSectionTest.java b/src/test/java/org/bukkit/configuration/ConfigurationSectionTest.java
+index bfaacbaa33d05042eb5e8eea46e6a884d40e1aae..2b4c7de2e135d7b18ef51fed614bf1e4001c2fd7 100644
+--- a/src/test/java/org/bukkit/configuration/ConfigurationSectionTest.java
++++ b/src/test/java/org/bukkit/configuration/ConfigurationSectionTest.java
+@@ -20,16 +20,16 @@ public abstract class ConfigurationSectionTest {
+     public void testGetKeys() {
+         ConfigurationSection section = getConfigurationSection();
+ 
+-        section.set("key", true);
++        section.set("memory", true);
+         section.set("subsection.subkey", true);
+         section.set("subsection.subkey2", true);
+-        section.set("subsection.subsubsection.key", true);
++        section.set("subsection.subsubsection.memory", true);
+         section.set("key2", true);
+         section.set("42", true);
+ 
+-        assertArrayEquals(new String[]{"key", "subsection", "key2", "42"}, section.getKeys(false).toArray());
+-        assertArrayEquals(new String[]{"key", "subsection", "subsection.subkey", "subsection.subkey2", "subsection.subsubsection", "subsection.subsubsection.key", "key2", "42"}, section.getKeys(true).toArray());
+-        assertArrayEquals(new String[]{"subkey", "subkey2", "subsubsection", "subsubsection.key"}, section.getConfigurationSection("subsection").getKeys(true).toArray());
++        assertArrayEquals(new String[]{"memory", "subsection", "key2", "42"}, section.getKeys(false).toArray());
++        assertArrayEquals(new String[]{"memory", "subsection", "subsection.subkey", "subsection.subkey2", "subsection.subsubsection", "subsection.subsubsection.memory", "key2", "42"}, section.getKeys(true).toArray());
++        assertArrayEquals(new String[]{"subkey", "subkey2", "subsubsection", "subsubsection.memory"}, section.getConfigurationSection("subsection").getKeys(true).toArray());
+     }
+ 
+     @Test
+@@ -37,15 +37,15 @@ public abstract class ConfigurationSectionTest {
+         ConfigurationSection section = getConfigurationSection();
+         section.getRoot().options().copyDefaults(true);
+ 
+-        section.set("key", true);
++        section.set("memory", true);
+         section.addDefault("subsection.subkey", true);
+         section.addDefault("subsection.subkey2", true);
+-        section.addDefault("subsection.subsubsection.key", true);
++        section.addDefault("subsection.subsubsection.memory", true);
+         section.addDefault("key2", true);
+ 
+-        assertArrayEquals(new String[]{"subsection", "key2", "key"}, section.getKeys(false).toArray());
+-        assertArrayEquals(new String[]{"subsection", "subsection.subkey", "subsection.subkey2", "subsection.subsubsection", "subsection.subsubsection.key", "key2", "key"}, section.getKeys(true).toArray());
+-        assertArrayEquals(new String[]{"subkey", "subkey2", "subsubsection", "subsubsection.key"}, section.getConfigurationSection("subsection").getKeys(true).toArray());
++        assertArrayEquals(new String[]{"subsection", "key2", "memory"}, section.getKeys(false).toArray());
++        assertArrayEquals(new String[]{"subsection", "subsection.subkey", "subsection.subkey2", "subsection.subsubsection", "subsection.subsubsection.memory", "key2", "memory"}, section.getKeys(true).toArray());
++        assertArrayEquals(new String[]{"subkey", "subkey2", "subsubsection", "subsubsection.memory"}, section.getConfigurationSection("subsection").getKeys(true).toArray());
+     }
+ 
+     @Test
+diff --git a/src/test/java/org/bukkit/configuration/file/YamlConfigurationTest.java b/src/test/java/org/bukkit/configuration/file/YamlConfigurationTest.java
+index cd79a3487fc660759f58b6e0333a2228b08c0c02..8b76987d1bd0578f57ccaa13b10c85c1ee3e77e1 100644
+--- a/src/test/java/org/bukkit/configuration/file/YamlConfigurationTest.java
++++ b/src/test/java/org/bukkit/configuration/file/YamlConfigurationTest.java
+@@ -49,10 +49,10 @@ public class YamlConfigurationTest extends FileConfigurationTest {
+         YamlConfiguration config = getConfig();
+         config.options().indent(9);
+ 
+-        config.set("section.key", 1);
++        config.set("section.memory", 1);
+ 
+         String result = config.saveToString();
+-        String expected = "section:\n         key: 1\n";
++        String expected = "section:\n         memory: 1\n";
+ 
+         assertEquals(expected, result);
+     }
+diff --git a/src/test/java/org/bukkit/conversations/ConversationContextTest.java b/src/test/java/org/bukkit/conversations/ConversationContextTest.java
+index 3780a47c1f48d47b39a0e8a36c64044b366f8cc0..d7042c4f75bacc079d8e9cf12bed86f0b76703e5 100644
+--- a/src/test/java/org/bukkit/conversations/ConversationContextTest.java
++++ b/src/test/java/org/bukkit/conversations/ConversationContextTest.java
+@@ -26,8 +26,8 @@ public class ConversationContextTest {
+     public void TestSessionData() {
+         Conversable conversable = new FakeConversable();
+         Map session = new HashMap();
+-        session.put("key", "value");
++        session.put("memory", "value");
+         ConversationContext context = new ConversationContext(null, conversable, session);
+-        assertEquals("value", context.getSessionData("key"));
++        assertEquals("value", context.getSessionData("memory"));
+     }
+ }
+diff --git a/src/test/java/org/bukkit/metadata/MetadataStoreTest.java b/src/test/java/org/bukkit/metadata/MetadataStoreTest.java
+index 12373ff16ca71bc437929ea5c4486c2c6bd93d09..fa8a72c59d22e323bc23e6e7d207f86db0c2beb6 100644
+--- a/src/test/java/org/bukkit/metadata/MetadataStoreTest.java
++++ b/src/test/java/org/bukkit/metadata/MetadataStoreTest.java
+@@ -15,17 +15,17 @@ public class MetadataStoreTest {
+ 
+     @Test
+     public void testMetadataStore() {
+-        subject.setMetadata("subject", "key", new FixedMetadataValue(pluginX, 10));
++        subject.setMetadata("subject", "memory", new FixedMetadataValue(pluginX, 10));
+ 
+-        assertTrue(subject.hasMetadata("subject", "key"));
+-        List<MetadataValue> values = subject.getMetadata("subject", "key");
++        assertTrue(subject.hasMetadata("subject", "memory"));
++        List<MetadataValue> values = subject.getMetadata("subject", "memory");
+         assertEquals(10, values.get(0).value());
+     }
+ 
+     @Test
+     public void testMetadataNotPresent() {
+-        assertFalse(subject.hasMetadata("subject", "key"));
+-        List<MetadataValue> values = subject.getMetadata("subject", "key");
++        assertFalse(subject.hasMetadata("subject", "memory"));
++        List<MetadataValue> values = subject.getMetadata("subject", "memory");
+         assertTrue(values.isEmpty());
+     }
+ 
+@@ -33,7 +33,7 @@ public class MetadataStoreTest {
+     public void testInvalidateAll() {
+         final Counter counter = new Counter();
+ 
+-        subject.setMetadata("subject", "key", new LazyMetadataValue(pluginX, new Callable<Object>() {
++        subject.setMetadata("subject", "memory", new LazyMetadataValue(pluginX, new Callable<Object>() {
+             @Override
+             public Object call() throws Exception {
+                 counter.increment();
+@@ -41,10 +41,10 @@ public class MetadataStoreTest {
+             }
+         }));
+ 
+-        assertTrue(subject.hasMetadata("subject", "key"));
+-        subject.getMetadata("subject", "key").get(0).value();
++        assertTrue(subject.hasMetadata("subject", "memory"));
++        subject.getMetadata("subject", "memory").get(0).value();
+         subject.invalidateAll(pluginX);
+-        subject.getMetadata("subject", "key").get(0).value();
++        subject.getMetadata("subject", "memory").get(0).value();
+         assertEquals(2, counter.value());
+     }
+ 
+@@ -52,7 +52,7 @@ public class MetadataStoreTest {
+     public void testInvalidateAllButActuallyNothing() {
+         final Counter counter = new Counter();
+ 
+-        subject.setMetadata("subject", "key", new LazyMetadataValue(pluginX, new Callable<Object>() {
++        subject.setMetadata("subject", "memory", new LazyMetadataValue(pluginX, new Callable<Object>() {
+             @Override
+             public Object call() throws Exception {
+                 counter.increment();
+@@ -60,20 +60,20 @@ public class MetadataStoreTest {
+             }
+         }));
+ 
+-        assertTrue(subject.hasMetadata("subject", "key"));
+-        subject.getMetadata("subject", "key").get(0).value();
++        assertTrue(subject.hasMetadata("subject", "memory"));
++        subject.getMetadata("subject", "memory").get(0).value();
+         subject.invalidateAll(pluginY);
+-        subject.getMetadata("subject", "key").get(0).value();
++        subject.getMetadata("subject", "memory").get(0).value();
+         assertEquals(1, counter.value());
+     }
+ 
+     @Test
+     public void testMetadataReplace() {
+-        subject.setMetadata("subject", "key", new FixedMetadataValue(pluginX, 10));
+-        subject.setMetadata("subject", "key", new FixedMetadataValue(pluginY, 10));
+-        subject.setMetadata("subject", "key", new FixedMetadataValue(pluginX, 20));
++        subject.setMetadata("subject", "memory", new FixedMetadataValue(pluginX, 10));
++        subject.setMetadata("subject", "memory", new FixedMetadataValue(pluginY, 10));
++        subject.setMetadata("subject", "memory", new FixedMetadataValue(pluginX, 20));
+ 
+-        for (MetadataValue mv : subject.getMetadata("subject", "key")) {
++        for (MetadataValue mv : subject.getMetadata("subject", "memory")) {
+             if (mv.getOwningPlugin().equals(pluginX)) {
+                 assertEquals(20, mv.value());
+             }
+@@ -85,38 +85,38 @@ public class MetadataStoreTest {
+ 
+     @Test
+     public void testMetadataRemove() {
+-        subject.setMetadata("subject", "key", new FixedMetadataValue(pluginX, 10));
+-        subject.setMetadata("subject", "key", new FixedMetadataValue(pluginY, 20));
+-        subject.removeMetadata("subject", "key", pluginX);
++        subject.setMetadata("subject", "memory", new FixedMetadataValue(pluginX, 10));
++        subject.setMetadata("subject", "memory", new FixedMetadataValue(pluginY, 20));
++        subject.removeMetadata("subject", "memory", pluginX);
+ 
+-        assertTrue(subject.hasMetadata("subject", "key"));
+-        assertEquals(1, subject.getMetadata("subject", "key").size());
+-        assertEquals(20, subject.getMetadata("subject", "key").get(0).value());
++        assertTrue(subject.hasMetadata("subject", "memory"));
++        assertEquals(1, subject.getMetadata("subject", "memory").size());
++        assertEquals(20, subject.getMetadata("subject", "memory").get(0).value());
+     }
+ 
+     @Test
+     public void testMetadataRemoveLast() {
+-        subject.setMetadata("subject", "key", new FixedMetadataValue(pluginX, 10));
+-        subject.removeMetadata("subject", "key", pluginX);
++        subject.setMetadata("subject", "memory", new FixedMetadataValue(pluginX, 10));
++        subject.removeMetadata("subject", "memory", pluginX);
+ 
+-        assertFalse(subject.hasMetadata("subject", "key"));
+-        assertEquals(0, subject.getMetadata("subject", "key").size());
++        assertFalse(subject.hasMetadata("subject", "memory"));
++        assertEquals(0, subject.getMetadata("subject", "memory").size());
+     }
+ 
+     @Test
+     public void testMetadataRemoveForNonExistingPlugin() {
+-        subject.setMetadata("subject", "key", new FixedMetadataValue(pluginX, 10));
+-        subject.removeMetadata("subject", "key", pluginY);
++        subject.setMetadata("subject", "memory", new FixedMetadataValue(pluginX, 10));
++        subject.removeMetadata("subject", "memory", pluginY);
+ 
+-        assertTrue(subject.hasMetadata("subject", "key"));
+-        assertEquals(1, subject.getMetadata("subject", "key").size());
+-        assertEquals(10, subject.getMetadata("subject", "key").get(0).value());
++        assertTrue(subject.hasMetadata("subject", "memory"));
++        assertEquals(1, subject.getMetadata("subject", "memory").size());
++        assertEquals(10, subject.getMetadata("subject", "memory").get(0).value());
+     }
+ 
+     @Test
+     public void testHasMetadata() {
+-        subject.setMetadata("subject", "key", new FixedMetadataValue(pluginX, 10));
+-        assertTrue(subject.hasMetadata("subject", "key"));
++        subject.setMetadata("subject", "memory", new FixedMetadataValue(pluginX, 10));
++        assertTrue(subject.hasMetadata("subject", "memory"));
+         assertFalse(subject.hasMetadata("subject", "otherKey"));
+     }
+ 
