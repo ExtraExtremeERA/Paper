@@ -2,7 +2,8 @@ package io.papermc.paper.testplugin.behaviors;
 
 import io.papermc.paper.entity.brain.BrainManager;
 import io.papermc.paper.entity.brain.activity.behavior.Behavior;
-import io.papermc.paper.entity.brain.memory.MemoryKeyStatus;
+import io.papermc.paper.entity.brain.memory.MemoryManager;
+import io.papermc.paper.entity.brain.memory.MemoryTypeStatus;
 import io.papermc.paper.entity.brain.memory.MemoryPair;
 import io.papermc.paper.testplugin.TestPlugin;
 import net.kyori.adventure.sound.Sound;
@@ -10,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Squid;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,12 +26,12 @@ public class HuntSquidsBehavior implements Behavior<Mob> {
 
     @Override
     public void tick(Mob entity) {
-        List<Squid> squids = entity.getMemory(TestPlugin.SQUID_CANDIDATES);
+        MemoryManager memoryManager = Bukkit.getBrainManager().getMemoryManager();
+        List<Squid> squids = memoryManager.getMemory(entity, TestPlugin.SQUID_CANDIDATES).orElse(new ArrayList<>());
         if (target == null || target.isDead()) {
-            BrainManager manager = Bukkit.getBrainManager();
             if (squids.isEmpty()) {
-                manager.forgetMemory(entity, TestPlugin.SQUID_CANDIDATES);
-                manager.forgetMemory(entity, TestPlugin.SQUID_RAGE);
+                memoryManager.eraseMemory(entity, TestPlugin.SQUID_CANDIDATES);
+                memoryManager.eraseMemory(entity, TestPlugin.SQUID_RAGE);
                 return;
             }
 
@@ -52,7 +54,8 @@ public class HuntSquidsBehavior implements Behavior<Mob> {
 
     @Override
     public boolean canStillRun(Mob entity) {
-        return entity.getMemory(TestPlugin.SQUID_RAGE) != null && entity.getMemory(TestPlugin.SQUID_CANDIDATES) != null && !entity.getMemory(TestPlugin.SQUID_CANDIDATES).isEmpty();
+        MemoryManager memoryManager = Bukkit.getBrainManager().getMemoryManager();
+        return memoryManager.getMemory(entity, TestPlugin.SQUID_RAGE).isPresent() && memoryManager.getMemory(entity, TestPlugin.SQUID_CANDIDATES).isPresent() && !memoryManager.getMemory(entity, TestPlugin.SQUID_CANDIDATES).get().isEmpty();
     }
 
     @Override
@@ -67,6 +70,6 @@ public class HuntSquidsBehavior implements Behavior<Mob> {
 
     @Override
     public Collection<MemoryPair> getMemoryRequirements() {
-        return List.of(new MemoryPair(MemoryKeyStatus.PRESENT, TestPlugin.SQUID_RAGE), new MemoryPair(MemoryKeyStatus.PRESENT, TestPlugin.SQUID_CANDIDATES));
+        return List.of(new MemoryPair(MemoryTypeStatus.PRESENT, TestPlugin.SQUID_RAGE), new MemoryPair(MemoryTypeStatus.PRESENT, TestPlugin.SQUID_CANDIDATES));
     }
 }

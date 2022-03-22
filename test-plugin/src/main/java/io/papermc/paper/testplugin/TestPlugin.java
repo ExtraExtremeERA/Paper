@@ -2,6 +2,8 @@ package io.papermc.paper.testplugin;
 
 import io.papermc.paper.entity.brain.BrainManager;
 import io.papermc.paper.entity.brain.activity.VanillaActivityKey;
+import io.papermc.paper.entity.brain.memory.MemoryManager;
+import io.papermc.paper.entity.brain.memory.MemoryModuleType;
 import io.papermc.paper.entity.brain.sensor.SensorKey;
 import io.papermc.paper.testplugin.behaviors.ClosestParrotSensor;
 import io.papermc.paper.testplugin.behaviors.ClosestSquidsSensor;
@@ -23,6 +25,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collection;
 import java.util.List;
+import org.bukkit.Location;
 
 public final class TestPlugin extends JavaPlugin implements Listener {
 
@@ -31,10 +34,11 @@ public final class TestPlugin extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(this, this);
     }
 
-    public static final MemoryKey<List<Squid>> SQUID_CANDIDATES = Bukkit.createMemoryKey(NamespacedKey.fromString("squid_candidates"));
-    public static final MemoryKey<List<Parrot>> NEARBY_PARROTS = Bukkit.createMemoryKey(NamespacedKey.fromString("nearby_parrots"));
+    public static final MemoryModuleType<List<Squid>> SQUID_CANDIDATES = Bukkit.createMemoryModuleType(NamespacedKey.fromString("squid_candidates"));
+    public static final MemoryModuleType<List<Parrot>> NEARBY_PARROTS = Bukkit.createMemoryModuleType(NamespacedKey.fromString("nearby_parrots"));
+    public static final MemoryModuleType<Location> MEETING_POINT = Bukkit.createMemoryModuleType(MemoryKey.MEETING_POINT);
 
-    public static final MemoryKey<Boolean> SQUID_RAGE = Bukkit.createMemoryKey(NamespacedKey.fromString("squid_rage"));
+    public static final MemoryModuleType<Boolean> SQUID_RAGE = Bukkit.createMemoryModuleType(NamespacedKey.fromString("squid_rage"));
 
     private final SensorKey SNIFF_SQUID_SENSOR = Bukkit.createSensorKey(NamespacedKey.fromString("scary_mobs_finder", this));
     private final SensorKey PARROT_SENSOR = Bukkit.createSensorKey(NamespacedKey.fromString("parrot_finder", this));
@@ -42,7 +46,8 @@ public final class TestPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onInteractEntity(PlayerInteractEntityEvent event) {
         if (event.getRightClicked() instanceof Goat brainHolder) {
-            BrainManager manager = Bukkit.getBrainManager();
+            final BrainManager manager = Bukkit.getBrainManager();
+            final MemoryManager memoryManager = manager.getMemoryManager();
             System.out.println("Activities: ");
             for (var activities : manager.getPrioritizedActivities(brainHolder).entrySet()) {
                 debug("Priority: " + activities.getKey(), activities.getValue());
@@ -50,7 +55,7 @@ public final class TestPlugin extends JavaPlugin implements Listener {
             debug("Core Activities", manager.getCoreActivities(brainHolder));
             debug("Active Activities", manager.getActiveActivities(brainHolder));
             System.out.println("Sensors: " + manager.getSensors(brainHolder));
-            debug("Memories", manager.getMemories(brainHolder));
+            debugKey("Memories", memoryManager.getMemoryTypes(brainHolder).stream().map(mem -> mem.getKey()).toList());
 
             if (event.getPlayer().isSneaking()) {
                 return;
@@ -58,11 +63,12 @@ public final class TestPlugin extends JavaPlugin implements Listener {
 
             // Clear vanilla stuff
             manager.clearActivities(brainHolder);
-            manager.unregisterMemories(brainHolder);
+            memoryManager.unregisterMemories(brainHolder);
             manager.clearSensors(brainHolder);
 
-            manager.registerMemory(brainHolder, SQUID_CANDIDATES); // Register the custom memory
-            manager.registerMemory(brainHolder, SQUID_RAGE);
+            memoryManager.registerMemoryType(brainHolder, SQUID_CANDIDATES); // Register the custom memory
+            memoryManager.registerMemoryType(brainHolder, SQUID_RAGE);
+            memoryManager.registerMemoryType(brainHolder, MEETING_POINT);
 
             manager.addActivity(brainHolder, VanillaActivityKey.IDLE, 1, List.of(new HuntSquidsBehavior(), new SpinBehavior()));
             manager.addActivity(brainHolder, VanillaActivityKey.CORE, 1, List.of(new SniffSquidsBehavior(), new ScreamAtParrotsBehavior()));
@@ -84,5 +90,10 @@ public final class TestPlugin extends JavaPlugin implements Listener {
             }
             System.out.println(keyed.getKey());
         }
+    }
+    
+    private static void debugKey(String name, Collection<? extends NamespacedKey> keyCollection) {
+        System.out.println(name + ":");
+        System.out.println(keyCollection);
     }
 }

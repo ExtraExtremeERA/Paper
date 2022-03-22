@@ -1,7 +1,7 @@
 package io.papermc.paper.testplugin.behaviors;
 
 import io.papermc.paper.entity.brain.activity.behavior.Behavior;
-import io.papermc.paper.entity.brain.memory.MemoryKeyStatus;
+import io.papermc.paper.entity.brain.memory.MemoryTypeStatus;
 import io.papermc.paper.entity.brain.memory.MemoryPair;
 import io.papermc.paper.testplugin.TestPlugin;
 import net.kyori.adventure.sound.Sound;
@@ -40,6 +40,6 @@ public class ScreamAtParrotsBehavior implements Behavior<Mob> {
 
     @Override
     public Collection<MemoryPair> getMemoryRequirements() {
-        return List.of(new MemoryPair(MemoryKeyStatus.PRESENT, TestPlugin.NEARBY_PARROTS));
+        return List.of(new MemoryPair(MemoryTypeStatus.PRESENT, TestPlugin.NEARBY_PARROTS));
     }
 }

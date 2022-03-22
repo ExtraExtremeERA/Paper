@@ -1,6 +1,8 @@
 package io.papermc.paper.testplugin.behaviors;
 
 import io.papermc.paper.entity.brain.BrainManager;
+import io.papermc.paper.entity.brain.memory.MemoryManager;
+import io.papermc.paper.entity.brain.memory.MemoryModuleType;
 import io.papermc.paper.entity.brain.sensor.Sensor;
 import io.papermc.paper.testplugin.TestPlugin;
 import org.bukkit.Bukkit;
@@ -29,17 +31,17 @@ public class ClosestParrotSensor implements Sensor<LivingEntity> {
             .map((parrot) -> ((Parrot) parrot))
             .toList();
 
-        BrainManager brainManager = Bukkit.getBrainManager();
+        MemoryManager memoryManager = Bukkit.getBrainManager().getMemoryManager();
         if (!parrots.isEmpty()) {
-            brainManager.setMemory(entity, TestPlugin.NEARBY_PARROTS, new ArrayList<>(parrots), Long.MAX_VALUE);
+            memoryManager.setMemory(entity, TestPlugin.NEARBY_PARROTS, new ArrayList<>(parrots), Long.MAX_VALUE);
         } else {
-            brainManager.forgetMemory(entity, TestPlugin.NEARBY_PARROTS);
+            memoryManager.eraseMemory(entity, TestPlugin.NEARBY_PARROTS);
         }
 
     }
 
     @Override
-    public @NotNull Collection<MemoryKey<?>> requiredMemories() {
+    public @NotNull Collection<MemoryModuleType<?>> requiredMemories() {
         return Set.of(TestPlugin.NEARBY_PARROTS);
     }
 }

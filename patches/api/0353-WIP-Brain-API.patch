@@ -6,16 +6,18 @@ Subject: [PATCH] WIP Brain API
 
 diff --git a/src/main/java/io/papermc/paper/entity/brain/BrainManager.java b/src/main/java/io/papermc/paper/entity/brain/BrainManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bfe47f0970
+index 0000000000000000000000000000000000000000..80c5261de15f8c9770f8c5f5f221e5b47a8b5e60
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/BrainManager.java
-@@ -0,0 +1,308 @@
+@@ -0,0 +1,248 @@
 +package io.papermc.paper.entity.brain;
 +
 +import io.papermc.paper.entity.brain.activity.ActivityKey;
 +import io.papermc.paper.entity.brain.activity.behavior.Behavior;
 +import io.papermc.paper.entity.brain.activity.behavior.BehaviorPair;
-+import io.papermc.paper.entity.brain.memory.MemoryKeyStatus;
++import io.papermc.paper.entity.brain.memory.MemoryModuleType;
++import io.papermc.paper.entity.brain.memory.MemoryTypeStatus;
++import io.papermc.paper.entity.brain.memory.MemoryManager;
 +import io.papermc.paper.entity.brain.memory.MemoryPair;
 +import io.papermc.paper.entity.brain.sensor.Sensor;
 +import io.papermc.paper.entity.brain.sensor.SensorKey;
@@ -123,13 +125,13 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +     * @param requiredMemory present memory required for this activity to start
 +     * @param <T> Entity type
 +     */
-+    default <T extends LivingEntity> void addActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key, int beginningPriority, @NotNull Collection<Behavior<? super T>> behaviors, @NotNull MemoryKey<?> requiredMemory) {
++    default <T extends LivingEntity> void addActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key, int beginningPriority, @NotNull Collection<Behavior<? super T>> behaviors, @NotNull MemoryModuleType<?> requiredMemory) {
 +        List<BehaviorPair<? super T>> pairs = new ArrayList<>(behaviors.size());
 +        for (Behavior<? super T> behavior : behaviors) {
 +            pairs.add(new BehaviorPair<>(beginningPriority++, behavior));
 +        }
 +
-+        this.addActivity(livingEntity, key, pairs, List.of(new MemoryPair(MemoryKeyStatus.PRESENT, requiredMemory)));
++        this.addActivity(livingEntity, key, pairs, List.of(new MemoryPair(MemoryTypeStatus.PRESENT, requiredMemory)));
 +    }
 +
 +    /**
@@ -171,7 +173,7 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +     * @param keysToRemoveOnFinish memories that are removed when this activity is finished
 +     * @param <T> Entity type
 +     */
-+    <T extends LivingEntity> void addActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key, @NotNull Collection<BehaviorPair<? super T>> behaviorPairs, @NotNull Collection<MemoryPair> requiredMemories, @NotNull Collection<MemoryKey<?>> keysToRemoveOnFinish);
++    <T extends LivingEntity> void addActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key, @NotNull Collection<BehaviorPair<? super T>> behaviorPairs, @NotNull Collection<MemoryPair> requiredMemories, @NotNull Collection<MemoryModuleType<?>> keysToRemoveOnFinish);
 +
 +    /**
 +     * Gets the default activity.
@@ -252,70 +254,8 @@ index 0000000000000000000000000000000000000000..d9770186e6721757bc995aea7e8421bf
 +    @NotNull
 +    Collection<Sensor<? extends LivingEntity>> getSensors(@NotNull LivingEntity livingEntity);
 +
-+    /**
-+     * Registers a memory, this is required inorder to set
-+     * memories that do not exist already.
-+     * This is mostly useful if you are inserting custom memory keys.
-+     *
-+     * @param livingEntity given entity
-+     * @param memoryKey memorykey to register
-+     */
-+    void registerMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey);
-+
-+    /**
-+     * Sets the value of a memory.
-+     * This will not do anything if the memorykey isn't currently registered.
-+     *
-+     * @param livingEntity given entity
-+     * @param memoryKey key
-+     * @param value value to set
-+     * @param expireIn ticks to expire in
-+     * @param <V> value type
-+     */
-+    <V> void setMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<V> memoryKey, @Nullable V value, long expireIn);
-+
-+    /**
-+     * Forgets the provided memory, this is equivalent to setting the memory value to null.
-+     * This will not unregister the memory.
-+     *
-+     * @param livingEntity given entity
-+     * @param memoryKey key
-+     */
-+    void forgetMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey);
-+
-+    /**
-+     * Unregisters the provided memory.
-+     *
-+     * @param livingEntity given entity
-+     * @param memoryKey key
-+     */
-+    void unregisterMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey);
-+
-+    /**
-+     * Gets if the current memorykey matches the given key status.
-+     *
-+     * @param livingEntity given entity
-+     * @param memoryKey key
-+     * @param status status
-+     * @return if the status is met
-+     */
-+    boolean memoryStatusMatches(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey, @NotNull MemoryKeyStatus status);
-+
-+    /**
-+     * Gets the currently registered memory keys.
-+     *
-+     * @param livingEntity given entity
-+     * @return keys
-+     */
 +    @NotNull
-+    Collection<MemoryKey<?>> getMemories(@NotNull LivingEntity livingEntity);
-+
-+    /**
-+     * Unregisters all memories.
-+     *
-+     * @param livingEntity given entity
-+     */
-+    void unregisterMemories(@NotNull LivingEntity livingEntity);
++    MemoryManager getMemoryManager();
 +
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/activity/ActivityKey.java b/src/main/java/io/papermc/paper/entity/brain/activity/ActivityKey.java
@@ -497,34 +437,151 @@ index 0000000000000000000000000000000000000000..5105005291e0f033d615c14fd449298b
 + */
 +public record BehaviorPair<T extends LivingEntity>(int priority, Behavior<T> behavior) {
 +}
-diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/MemoryKeyStatus.java b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryKeyStatus.java
+diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/MemoryManager.java b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1f7d330d75d0aa76053c3a54786dbfbfac976aa4
+index 0000000000000000000000000000000000000000..60e60487b1f7189e21b33aaefbe219d371699586
 --- /dev/null
-+++ b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryKeyStatus.java
-@@ -0,0 +1,19 @@
++++ b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryManager.java
+@@ -0,0 +1,105 @@
 +package io.papermc.paper.entity.brain.memory;
 +
++import org.bukkit.entity.LivingEntity;
++import org.bukkit.entity.memory.MemoryKey;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.Collection;
++import java.util.Optional;
++
 +/**
-+ * Represents the current status that a memory may be in.
++ * Manager of memories in entities, mainly a replacement for {@link LivingEntity#setMemory(MemoryKey, Object)} and {@link LivingEntity#getMemory(MemoryKey)}.
++ * But also provides additional methods for registering custom memory types and interacting with memories.
 + */
-+public enum MemoryKeyStatus {
-+    /***
-+     * Represents a memorykey being only registered.
++public interface MemoryManager {
++    /**
++     * Registers a memory, this is required inorder to set
++     * memories that do not exist already.
++     * This is mostly useful if you are inserting custom memory keys.
++     *
++     * @param livingEntity given entity.
++     * @param memoryModuleType memory type to register.
 +     */
-+    REGISTERED,
-+    /***
-+     * Represents a registered memorykey with there currently not being a value present.
++    void registerMemoryType(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<?> memoryModuleType);
++
++    /**
++     * Unregisters the provided memory.
++     *
++     * @param livingEntity given entity
++     * @param memoryModuleType key
 +     */
-+    ABSENT,
-+    /***
-+     * Represents a registered memorykey with there being a value present.
++    void unregisterMemoryType(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<?> memoryModuleType);
++
++    /**
++     * Sets the memory value of the specified memory type for the given living entity.
++     * @param livingEntity living entity you want to set this memory value.
++     * @param memoryModuleType type of memory value you want to set.
++     * @param value memory value you want to set.
++     * @param <U> generic type of memory value.
 +     */
-+    PRESENT
++    <U> void setMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<U> memoryModuleType, @Nullable U value);
++
++    /**
++     * Sets the memory value of the specified memory type for the given living entity.
++     * @param livingEntity living entity you want to set this memory value.
++     * @param memoryModuleType type of memory value you want to set.
++     * @param value memory value you want to set.
++     * @param expiry time after which this memory value expires.
++     * @param <U> generic type of memory value.
++     */
++    <U> void setMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<U> memoryModuleType, @Nullable U value, long expiry);
++
++    /**
++     * Gets the memory of the specified memory type from the given living entity.
++     * @param livingEntity living entity you want to get this memory value.
++     * @param memoryModuleType type of memory value you want to get.
++     * @param <U> generic type of memory value.
++     * @return Optional with memory value if it exists in given living entity.
++     */
++    <U> Optional<U> getMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<U> memoryModuleType);
++
++    /**
++     * Gets the time until the given memory value of the given memory type expires.
++     * @param memoryModuleType Given memory type.
++     * @param <U> generic type of the
++     * @return time after which this memory value expires.
++     */
++    <U> long getTimeUntilExpiry(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<U> memoryModuleType);
++
++    /**
++     * Returns true if the current memory type matches the given key status.
++     *
++     * @param livingEntity given entity.
++     * @param memoryModuleType memory type.
++     * @param status status.
++     * @return if the status is met.
++     */
++    boolean memoryStatusMatches(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<?> memoryModuleType, @NotNull MemoryTypeStatus status);
++
++    /**
++     * Erases the provided memory, this is equivalent to setting the memory value to null.
++     * This will not unregister the memory.
++     *
++     * @param livingEntity given entity.
++     * @param memoryModuleType memory type.
++     */
++    void eraseMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<?> memoryModuleType);
++
++    /**
++     * Unregisters all memories.
++     *
++     * @param livingEntity given entity
++     */
++    void unregisterMemories(@NotNull LivingEntity livingEntity);
++
++    /**
++     * Gets the currently registered memory types.
++     *
++     * @param livingEntity given entity
++     * @return memory types
++     */
++    @NotNull
++    Collection<MemoryModuleType<?>> getMemoryTypes(@NotNull LivingEntity livingEntity);
++
++}
+diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/MemoryModuleType.java b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryModuleType.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d1b6c60d30cbd5d1aa35f33ac4b9379d8e07413e
+--- /dev/null
++++ b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryModuleType.java
+@@ -0,0 +1,25 @@
++package io.papermc.paper.entity.brain.memory;
++
++import org.bukkit.NamespacedKey;
++import org.bukkit.entity.memory.MemoryKey;
++
++import java.util.Optional;
++
++/**
++ * Represents type of memories with which Sensors store values and Activities operate.
++ * It has compatibility with Bukkit MemoryKey API {@link MemoryKey}.
++ * @param <U> Type of value which will stored in this memory.
++ */
++public interface MemoryModuleType<U> {
++    /**
++     *
++     * @return Optional containing MemoryKey if this memory module type associated with some vanilla memory key from bukkit API. {@link MemoryKey}
++     */
++    Optional<MemoryKey<U>> getMemoryKey();
++
++    /**
++     * Gets unique key for registering custom memory module types.
++     * @return key of this memory module type.
++     */
++    NamespacedKey getKey();
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/MemoryPair.java b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryPair.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1ff50af8ac677ae05f60e3deb9a398d2ac9465be
+index 0000000000000000000000000000000000000000..db0be61b67cd16aee8aebdf8111c3c29a586c238
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryPair.java
 @@ -0,0 +1,9 @@
@@ -535,16 +592,42 @@ index 0000000000000000000000000000000000000000..1ff50af8ac677ae05f60e3deb9a398d2
 +/**
 + * A memory pair represents a memory and what key status it is required to have.
 + */
-+public record MemoryPair(MemoryKeyStatus requiredStatus, MemoryKey<?> key) {
++public record MemoryPair(MemoryTypeStatus requiredStatus, MemoryModuleType<?> key) {
++}
+diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/MemoryTypeStatus.java b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryTypeStatus.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..7bb09e13eea46f031c1f19a33cc05964dc82e7e7
+--- /dev/null
++++ b/src/main/java/io/papermc/paper/entity/brain/memory/MemoryTypeStatus.java
+@@ -0,0 +1,19 @@
++package io.papermc.paper.entity.brain.memory;
++
++/**
++ * Represents the current status that a memory type may be in.
++ */
++public enum MemoryTypeStatus {
++    /***
++     * Represents a memory type being only registered.
++     */
++    REGISTERED,
++    /***
++     * Represents a registered memory type with there currently not being a value present.
++     */
++    ABSENT,
++    /***
++     * Represents a registered memory type with there being a value present.
++     */
++    PRESENT
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/sensor/Sensor.java b/src/main/java/io/papermc/paper/entity/brain/sensor/Sensor.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..23a09b4119792388e2a04da8217724f637e68491
+index 0000000000000000000000000000000000000000..e4086bb3b6b3c694cea6fc8dfe81340afc0d6ad1
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/sensor/Sensor.java
-@@ -0,0 +1,38 @@
+@@ -0,0 +1,39 @@
 +package io.papermc.paper.entity.brain.sensor;
 +
++import io.papermc.paper.entity.brain.memory.MemoryModuleType;
 +import org.bukkit.entity.LivingEntity;
 +import org.bukkit.entity.memory.MemoryKey;
 +import org.jetbrains.annotations.NotNull;
@@ -579,7 +662,7 @@ index 0000000000000000000000000000000000000000..23a09b4119792388e2a04da8217724f6
 +     * @return
 +     */
 +    @NotNull
-+    Collection<MemoryKey<?>> requiredMemories();
++    Collection<MemoryModuleType<?>> requiredMemories();
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/sensor/SensorKey.java b/src/main/java/io/papermc/paper/entity/brain/sensor/SensorKey.java
 new file mode 100644
@@ -649,10 +732,18 @@ index 0000000000000000000000000000000000000000..ce883ff02a01cfe687369e370b614063
 +
 +}
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 53c4e5ca208ee17c7c244e416c537c7b63edf194..c9386d0f381df6c9c55269727a63845a689d45b8 100644
+index 53c4e5ca208ee17c7c244e416c537c7b63edf194..e2af68fab17804faaba243f9de59c08c6fdaeeb5 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -2175,6 +2175,52 @@ public final class Bukkit {
+@@ -52,6 +52,7 @@ import org.jetbrains.annotations.Contract;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ import io.papermc.paper.util.JarManifests; // Paper
++import org.bukkit.entity.memory.MemoryKey;
+ 
+ /**
+  * Represents the Bukkit core, for version and Server singleton handling
+@@ -2175,6 +2176,64 @@ public final class Bukkit {
      public static io.papermc.paper.datapack.DatapackManager getDatapackManager() {
          return server.getDatapackManager();
      }
@@ -689,8 +780,20 @@ index 53c4e5ca208ee17c7c244e416c537c7b63edf194..c9386d0f381df6c9c55269727a63845a
 +     * @return memory key
 +     */
 +    @NotNull
-+    public static <T> org.bukkit.entity.memory.MemoryKey<T> createMemoryKey(@NotNull NamespacedKey key) {
-+        return server.createMemoryKey(key);
++    public static <U> io.papermc.paper.entity.brain.memory.MemoryModuleType<U> createMemoryModuleType(@NotNull NamespacedKey key) {
++        return server.createMemoryModuleType(key);
++    }
++    
++    /**
++     * Creates a custom memory key used in the mob brain api
++     * to register your own types.
++     *
++     * @param key memory identifier
++     * @return memory key
++     */
++    @NotNull
++    public static <U> io.papermc.paper.entity.brain.memory.MemoryModuleType<U> createMemoryModuleType(@NotNull MemoryKey<U> key) {
++        return server.createMemoryModuleType(key);
 +    }
 +
 +    /**
@@ -706,10 +809,18 @@ index 53c4e5ca208ee17c7c244e416c537c7b63edf194..c9386d0f381df6c9c55269727a63845a
  
      @NotNull
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index e48af3822e9f118399c3a1c9358c56efae12e0da..ea15afec06bf54ad1ce7759ca627c0a10b351b69 100644
+index e48af3822e9f118399c3a1c9358c56efae12e0da..24e0ed8b84bdd06fa2236dca6ad088a93b29242e 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -1887,5 +1887,42 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -27,6 +27,7 @@ import org.bukkit.command.ConsoleCommandSender;
+ import org.bukkit.command.PluginCommand;
+ import org.bukkit.entity.Entity;
+ import org.bukkit.entity.Player;
++import org.bukkit.entity.memory.MemoryKey;
+ import org.bukkit.event.inventory.InventoryType;
+ import org.bukkit.event.server.ServerListPingEvent;
+ import org.bukkit.generator.ChunkGenerator;
+@@ -1887,5 +1888,50 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
       */
      @NotNull
      io.papermc.paper.datapack.DatapackManager getDatapackManager();
@@ -735,18 +846,26 @@ index e48af3822e9f118399c3a1c9358c56efae12e0da..ea15afec06bf54ad1ce7759ca627c0a1
 +    io.papermc.paper.entity.brain.sensor.SensorKey createSensorKey(@NotNull NamespacedKey key);
 +
 +    /**
-+     * Creates a custom memory key used in the mob brain api
-+     * to register your own types.
++     * Creates a custom memory type used in the Mob Brain-API.
 +     *
 +     * @param key memory identifier
 +     * @return memory key
 +     */
 +    @NotNull
-+    <T> org.bukkit.entity.memory.MemoryKey<T> createMemoryKey(@NotNull NamespacedKey key);
++    <U> io.papermc.paper.entity.brain.memory.MemoryModuleType<U> createMemoryModuleType(@NotNull NamespacedKey key);
++
++    /**
++     * Creates a custom memory type used in the Mob Brain-API to register your own types.
++     *
++     * @param key memory identifier
++     * @return memory key
++     */
++    @NotNull
++    <U> io.papermc.paper.entity.brain.memory.MemoryModuleType<U> createMemoryModuleType(@NotNull MemoryKey<U> key);
 +
 +    /**
 +     * Gets the brain manager.
-+     * @return
++     * @return brain manager.
 +     */
 +    @NotNull
 +    io.papermc.paper.entity.brain.BrainManager getBrainManager();

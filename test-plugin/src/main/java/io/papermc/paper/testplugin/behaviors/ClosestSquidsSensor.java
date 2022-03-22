@@ -1,6 +1,8 @@
 package io.papermc.paper.testplugin.behaviors;
 
 import io.papermc.paper.entity.brain.BrainManager;
+import io.papermc.paper.entity.brain.memory.MemoryManager;
+import io.papermc.paper.entity.brain.memory.MemoryModuleType;
 import io.papermc.paper.entity.brain.sensor.Sensor;
 import io.papermc.paper.testplugin.TestPlugin;
 import org.bukkit.Bukkit;
@@ -28,11 +30,11 @@ public class ClosestSquidsSensor implements Sensor<LivingEntity> {
             .map((squid) -> ((Squid) squid))
             .toList();
 
-        BrainManager brainManager = Bukkit.getBrainManager();
+        MemoryManager brainManager = Bukkit.getBrainManager().getMemoryManager();
         if (!squids.isEmpty()) {
             brainManager.setMemory(entity, TestPlugin.SQUID_CANDIDATES, new ArrayList<>(squids), Long.MAX_VALUE);
         } else {
-            brainManager.forgetMemory(entity, TestPlugin.SQUID_CANDIDATES);
+            brainManager.eraseMemory(entity, TestPlugin.SQUID_CANDIDATES);
         }
 
         if (squids.size() == 3) { // Once 3 squids are found
@@ -41,7 +43,7 @@ public class ClosestSquidsSensor implements Sensor<LivingEntity> {
     }
 
     @Override
-    public @NotNull Collection<MemoryKey<?>> requiredMemories() {
+    public @NotNull Collection<MemoryModuleType<?>> requiredMemories() {
         return List.of(TestPlugin.SQUID_CANDIDATES, TestPlugin.SQUID_RAGE);
     }
 }
