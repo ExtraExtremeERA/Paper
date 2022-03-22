@@ -2,7 +2,6 @@ package io.papermc.paper.testplugin;
 
 import io.papermc.paper.entity.brain.BrainManager;
 import io.papermc.paper.entity.brain.activity.VanillaActivityKey;
-import io.papermc.paper.entity.brain.memory.MemoryModuleType;
 import io.papermc.paper.entity.brain.sensor.SensorKey;
 import io.papermc.paper.testplugin.behaviors.ClosestParrotSensor;
 import io.papermc.paper.testplugin.behaviors.ClosestSquidsSensor;
@@ -12,7 +11,6 @@ import io.papermc.paper.testplugin.behaviors.SniffSquidsBehavior;
 import io.papermc.paper.testplugin.behaviors.SpinBehavior;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
-import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Goat;
 import org.bukkit.entity.Parrot;
@@ -33,12 +31,10 @@ public final class TestPlugin extends JavaPlugin implements Listener {
         this.getServer().getPluginManager().registerEvents(this, this);
     }
 
-    public static final MemoryModuleType<List<Squid>> SQUID_CANDIDATES = Bukkit.createMemoryModuleType(NamespacedKey.fromString("squid_candidates"));
-    public static final MemoryModuleType<List<Parrot>> NEARBY_PARROTS = Bukkit.createMemoryModuleType(NamespacedKey.fromString("nearby_parrots"));
+    public static final MemoryKey<List<Squid>> SQUID_CANDIDATES = Bukkit.createMemoryKey(NamespacedKey.fromString("squid_candidates"));
+    public static final MemoryKey<List<Parrot>> NEARBY_PARROTS = Bukkit.createMemoryKey(NamespacedKey.fromString("nearby_parrots"));
 
-    public static final MemoryModuleType<Location> DEFAULT_MEMORY = Bukkit.createMemoryModuleType(MemoryKey.MEETING_POINT);
-
-    public static final MemoryModuleType<Boolean> SQUID_RAGE = Bukkit.createMemoryModuleType(NamespacedKey.fromString("squid_rage"));
+    public static final MemoryKey<Boolean> SQUID_RAGE = Bukkit.createMemoryKey(NamespacedKey.fromString("squid_rage"));
 
     private final SensorKey SNIFF_SQUID_SENSOR = Bukkit.createSensorKey(NamespacedKey.fromString("scary_mobs_finder", this));
     private final SensorKey PARROT_SENSOR = Bukkit.createSensorKey(NamespacedKey.fromString("parrot_finder", this));
@@ -54,7 +50,7 @@ public final class TestPlugin extends JavaPlugin implements Listener {
             debug("Core Activities", manager.getCoreActivities(brainHolder));
             debug("Active Activities", manager.getActiveActivities(brainHolder));
             System.out.println("Sensors: " + manager.getSensors(brainHolder));
-            debug("Memories", manager.getMemories(brainHolder).stream().flatMap(mem -> mem.getMemoryKey().stream()).toList());
+            debug("Memories", manager.getMemories(brainHolder));
 
             if (event.getPlayer().isSneaking()) {
                 return;

@@ -4,447 +4,12 @@ Date: Mon, 29 Nov 2021 21:57:05 -0500
 Subject: [PATCH] WIP Brain API
 
 
-diff --git a/src/main/java/ca/spottedleaf/dataconverter/minecraft/converters/entity/ConverterFlattenEntity.java b/src/main/java/ca/spottedleaf/dataconverter/minecraft/converters/entity/ConverterFlattenEntity.java
-index afad2d92f78d4727ff4440ad2778f018d5a2a609..752cfaff385fe658b8f295725b765411f451cc17 100644
---- a/src/main/java/ca/spottedleaf/dataconverter/minecraft/converters/entity/ConverterFlattenEntity.java
-+++ b/src/main/java/ca/spottedleaf/dataconverter/minecraft/converters/entity/ConverterFlattenEntity.java
-@@ -311,7 +311,7 @@ public final class ConverterFlattenEntity extends DataConverter<MapType<String>,
-                 data.remove("TileID");
-                 data.remove("Tile");
- 
--                // key is from type update
-+                // memory is from type update
-                 data.setMap("BlockState", HelperBlockFlatteningV1450.getNBTForId((blockId << 4) | blockData).copy()); // copy to avoid problems with later state datafixers
- 
-                 return null;
-diff --git a/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V1344.java b/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V1344.java
-index ac390a6111ba1a4aae3d5726747f60f4929fa254..2bad285bd0203afe29c15e502923f56776b4662d 100644
---- a/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V1344.java
-+++ b/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V1344.java
-@@ -12,118 +12,118 @@ public final class V1344 {
- 
-     private static final Int2ObjectOpenHashMap<String> BUTTON_ID_TO_NAME = new Int2ObjectOpenHashMap<>();
-     static {
--        BUTTON_ID_TO_NAME.put(0, "key.unknown");
--        BUTTON_ID_TO_NAME.put(11, "key.0");
--        BUTTON_ID_TO_NAME.put(2, "key.1");
--        BUTTON_ID_TO_NAME.put(3, "key.2");
--        BUTTON_ID_TO_NAME.put(4, "key.3");
--        BUTTON_ID_TO_NAME.put(5, "key.4");
--        BUTTON_ID_TO_NAME.put(6, "key.5");
--        BUTTON_ID_TO_NAME.put(7, "key.6");
--        BUTTON_ID_TO_NAME.put(8, "key.7");
--        BUTTON_ID_TO_NAME.put(9, "key.8");
--        BUTTON_ID_TO_NAME.put(10, "key.9");
--        BUTTON_ID_TO_NAME.put(30, "key.a");
--        BUTTON_ID_TO_NAME.put(40, "key.apostrophe");
--        BUTTON_ID_TO_NAME.put(48, "key.b");
--        BUTTON_ID_TO_NAME.put(43, "key.backslash");
--        BUTTON_ID_TO_NAME.put(14, "key.backspace");
--        BUTTON_ID_TO_NAME.put(46, "key.c");
--        BUTTON_ID_TO_NAME.put(58, "key.caps.lock");
--        BUTTON_ID_TO_NAME.put(51, "key.comma");
--        BUTTON_ID_TO_NAME.put(32, "key.d");
--        BUTTON_ID_TO_NAME.put(211, "key.delete");
--        BUTTON_ID_TO_NAME.put(208, "key.down");
--        BUTTON_ID_TO_NAME.put(18, "key.e");
--        BUTTON_ID_TO_NAME.put(207, "key.end");
--        BUTTON_ID_TO_NAME.put(28, "key.enter");
--        BUTTON_ID_TO_NAME.put(13, "key.equal");
--        BUTTON_ID_TO_NAME.put(1, "key.escape");
--        BUTTON_ID_TO_NAME.put(33, "key.f");
--        BUTTON_ID_TO_NAME.put(59, "key.f1");
--        BUTTON_ID_TO_NAME.put(68, "key.f10");
--        BUTTON_ID_TO_NAME.put(87, "key.f11");
--        BUTTON_ID_TO_NAME.put(88, "key.f12");
--        BUTTON_ID_TO_NAME.put(100, "key.f13");
--        BUTTON_ID_TO_NAME.put(101, "key.f14");
--        BUTTON_ID_TO_NAME.put(102, "key.f15");
--        BUTTON_ID_TO_NAME.put(103, "key.f16");
--        BUTTON_ID_TO_NAME.put(104, "key.f17");
--        BUTTON_ID_TO_NAME.put(105, "key.f18");
--        BUTTON_ID_TO_NAME.put(113, "key.f19");
--        BUTTON_ID_TO_NAME.put(60, "key.f2");
--        BUTTON_ID_TO_NAME.put(61, "key.f3");
--        BUTTON_ID_TO_NAME.put(62, "key.f4");
--        BUTTON_ID_TO_NAME.put(63, "key.f5");
--        BUTTON_ID_TO_NAME.put(64, "key.f6");
--        BUTTON_ID_TO_NAME.put(65, "key.f7");
--        BUTTON_ID_TO_NAME.put(66, "key.f8");
--        BUTTON_ID_TO_NAME.put(67, "key.f9");
--        BUTTON_ID_TO_NAME.put(34, "key.g");
--        BUTTON_ID_TO_NAME.put(41, "key.grave.accent");
--        BUTTON_ID_TO_NAME.put(35, "key.h");
--        BUTTON_ID_TO_NAME.put(199, "key.home");
--        BUTTON_ID_TO_NAME.put(23, "key.i");
--        BUTTON_ID_TO_NAME.put(210, "key.insert");
--        BUTTON_ID_TO_NAME.put(36, "key.j");
--        BUTTON_ID_TO_NAME.put(37, "key.k");
--        BUTTON_ID_TO_NAME.put(82, "key.keypad.0");
--        BUTTON_ID_TO_NAME.put(79, "key.keypad.1");
--        BUTTON_ID_TO_NAME.put(80, "key.keypad.2");
--        BUTTON_ID_TO_NAME.put(81, "key.keypad.3");
--        BUTTON_ID_TO_NAME.put(75, "key.keypad.4");
--        BUTTON_ID_TO_NAME.put(76, "key.keypad.5");
--        BUTTON_ID_TO_NAME.put(77, "key.keypad.6");
--        BUTTON_ID_TO_NAME.put(71, "key.keypad.7");
--        BUTTON_ID_TO_NAME.put(72, "key.keypad.8");
--        BUTTON_ID_TO_NAME.put(73, "key.keypad.9");
--        BUTTON_ID_TO_NAME.put(78, "key.keypad.add");
--        BUTTON_ID_TO_NAME.put(83, "key.keypad.decimal");
--        BUTTON_ID_TO_NAME.put(181, "key.keypad.divide");
--        BUTTON_ID_TO_NAME.put(156, "key.keypad.enter");
--        BUTTON_ID_TO_NAME.put(141, "key.keypad.equal");
--        BUTTON_ID_TO_NAME.put(55, "key.keypad.multiply");
--        BUTTON_ID_TO_NAME.put(74, "key.keypad.subtract");
--        BUTTON_ID_TO_NAME.put(38, "key.l");
-+        BUTTON_ID_TO_NAME.put(0, "memory.unknown");
-+        BUTTON_ID_TO_NAME.put(11, "memory.0");
-+        BUTTON_ID_TO_NAME.put(2, "memory.1");
-+        BUTTON_ID_TO_NAME.put(3, "memory.2");
-+        BUTTON_ID_TO_NAME.put(4, "memory.3");
-+        BUTTON_ID_TO_NAME.put(5, "memory.4");
-+        BUTTON_ID_TO_NAME.put(6, "memory.5");
-+        BUTTON_ID_TO_NAME.put(7, "memory.6");
-+        BUTTON_ID_TO_NAME.put(8, "memory.7");
-+        BUTTON_ID_TO_NAME.put(9, "memory.8");
-+        BUTTON_ID_TO_NAME.put(10, "memory.9");
-+        BUTTON_ID_TO_NAME.put(30, "memory.a");
-+        BUTTON_ID_TO_NAME.put(40, "memory.apostrophe");
-+        BUTTON_ID_TO_NAME.put(48, "memory.b");
-+        BUTTON_ID_TO_NAME.put(43, "memory.backslash");
-+        BUTTON_ID_TO_NAME.put(14, "memory.backspace");
-+        BUTTON_ID_TO_NAME.put(46, "memory.c");
-+        BUTTON_ID_TO_NAME.put(58, "memory.caps.lock");
-+        BUTTON_ID_TO_NAME.put(51, "memory.comma");
-+        BUTTON_ID_TO_NAME.put(32, "memory.d");
-+        BUTTON_ID_TO_NAME.put(211, "memory.delete");
-+        BUTTON_ID_TO_NAME.put(208, "memory.down");
-+        BUTTON_ID_TO_NAME.put(18, "memory.e");
-+        BUTTON_ID_TO_NAME.put(207, "memory.end");
-+        BUTTON_ID_TO_NAME.put(28, "memory.enter");
-+        BUTTON_ID_TO_NAME.put(13, "memory.equal");
-+        BUTTON_ID_TO_NAME.put(1, "memory.escape");
-+        BUTTON_ID_TO_NAME.put(33, "memory.f");
-+        BUTTON_ID_TO_NAME.put(59, "memory.f1");
-+        BUTTON_ID_TO_NAME.put(68, "memory.f10");
-+        BUTTON_ID_TO_NAME.put(87, "memory.f11");
-+        BUTTON_ID_TO_NAME.put(88, "memory.f12");
-+        BUTTON_ID_TO_NAME.put(100, "memory.f13");
-+        BUTTON_ID_TO_NAME.put(101, "memory.f14");
-+        BUTTON_ID_TO_NAME.put(102, "memory.f15");
-+        BUTTON_ID_TO_NAME.put(103, "memory.f16");
-+        BUTTON_ID_TO_NAME.put(104, "memory.f17");
-+        BUTTON_ID_TO_NAME.put(105, "memory.f18");
-+        BUTTON_ID_TO_NAME.put(113, "memory.f19");
-+        BUTTON_ID_TO_NAME.put(60, "memory.f2");
-+        BUTTON_ID_TO_NAME.put(61, "memory.f3");
-+        BUTTON_ID_TO_NAME.put(62, "memory.f4");
-+        BUTTON_ID_TO_NAME.put(63, "memory.f5");
-+        BUTTON_ID_TO_NAME.put(64, "memory.f6");
-+        BUTTON_ID_TO_NAME.put(65, "memory.f7");
-+        BUTTON_ID_TO_NAME.put(66, "memory.f8");
-+        BUTTON_ID_TO_NAME.put(67, "memory.f9");
-+        BUTTON_ID_TO_NAME.put(34, "memory.g");
-+        BUTTON_ID_TO_NAME.put(41, "memory.grave.accent");
-+        BUTTON_ID_TO_NAME.put(35, "memory.h");
-+        BUTTON_ID_TO_NAME.put(199, "memory.home");
-+        BUTTON_ID_TO_NAME.put(23, "memory.i");
-+        BUTTON_ID_TO_NAME.put(210, "memory.insert");
-+        BUTTON_ID_TO_NAME.put(36, "memory.j");
-+        BUTTON_ID_TO_NAME.put(37, "memory.k");
-+        BUTTON_ID_TO_NAME.put(82, "memory.keypad.0");
-+        BUTTON_ID_TO_NAME.put(79, "memory.keypad.1");
-+        BUTTON_ID_TO_NAME.put(80, "memory.keypad.2");
-+        BUTTON_ID_TO_NAME.put(81, "memory.keypad.3");
-+        BUTTON_ID_TO_NAME.put(75, "memory.keypad.4");
-+        BUTTON_ID_TO_NAME.put(76, "memory.keypad.5");
-+        BUTTON_ID_TO_NAME.put(77, "memory.keypad.6");
-+        BUTTON_ID_TO_NAME.put(71, "memory.keypad.7");
-+        BUTTON_ID_TO_NAME.put(72, "memory.keypad.8");
-+        BUTTON_ID_TO_NAME.put(73, "memory.keypad.9");
-+        BUTTON_ID_TO_NAME.put(78, "memory.keypad.add");
-+        BUTTON_ID_TO_NAME.put(83, "memory.keypad.decimal");
-+        BUTTON_ID_TO_NAME.put(181, "memory.keypad.divide");
-+        BUTTON_ID_TO_NAME.put(156, "memory.keypad.enter");
-+        BUTTON_ID_TO_NAME.put(141, "memory.keypad.equal");
-+        BUTTON_ID_TO_NAME.put(55, "memory.keypad.multiply");
-+        BUTTON_ID_TO_NAME.put(74, "memory.keypad.subtract");
-+        BUTTON_ID_TO_NAME.put(38, "memory.l");
-         BUTTON_ID_TO_NAME.put(203, "key.left");
--        BUTTON_ID_TO_NAME.put(56, "key.left.alt");
--        BUTTON_ID_TO_NAME.put(26, "key.left.bracket");
--        BUTTON_ID_TO_NAME.put(29, "key.left.control");
--        BUTTON_ID_TO_NAME.put(42, "key.left.shift");
--        BUTTON_ID_TO_NAME.put(219, "key.left.win");
--        BUTTON_ID_TO_NAME.put(50, "key.m");
--        BUTTON_ID_TO_NAME.put(12, "key.minus");
--        BUTTON_ID_TO_NAME.put(49, "key.n");
--        BUTTON_ID_TO_NAME.put(69, "key.num.lock");
--        BUTTON_ID_TO_NAME.put(24, "key.o");
--        BUTTON_ID_TO_NAME.put(25, "key.p");
--        BUTTON_ID_TO_NAME.put(209, "key.page.down");
--        BUTTON_ID_TO_NAME.put(201, "key.page.up");
--        BUTTON_ID_TO_NAME.put(197, "key.pause");
--        BUTTON_ID_TO_NAME.put(52, "key.period");
--        BUTTON_ID_TO_NAME.put(183, "key.print.screen");
--        BUTTON_ID_TO_NAME.put(16, "key.q");
--        BUTTON_ID_TO_NAME.put(19, "key.r");
-+        BUTTON_ID_TO_NAME.put(56, "memory.left.alt");
-+        BUTTON_ID_TO_NAME.put(26, "memory.left.bracket");
-+        BUTTON_ID_TO_NAME.put(29, "memory.left.control");
-+        BUTTON_ID_TO_NAME.put(42, "memory.left.shift");
-+        BUTTON_ID_TO_NAME.put(219, "memory.left.win");
-+        BUTTON_ID_TO_NAME.put(50, "memory.m");
-+        BUTTON_ID_TO_NAME.put(12, "memory.minus");
-+        BUTTON_ID_TO_NAME.put(49, "memory.n");
-+        BUTTON_ID_TO_NAME.put(69, "memory.num.lock");
-+        BUTTON_ID_TO_NAME.put(24, "memory.o");
-+        BUTTON_ID_TO_NAME.put(25, "memory.p");
-+        BUTTON_ID_TO_NAME.put(209, "memory.page.down");
-+        BUTTON_ID_TO_NAME.put(201, "memory.page.up");
-+        BUTTON_ID_TO_NAME.put(197, "memory.pause");
-+        BUTTON_ID_TO_NAME.put(52, "memory.period");
-+        BUTTON_ID_TO_NAME.put(183, "memory.print.screen");
-+        BUTTON_ID_TO_NAME.put(16, "memory.q");
-+        BUTTON_ID_TO_NAME.put(19, "memory.r");
-         BUTTON_ID_TO_NAME.put(205, "key.right");
--        BUTTON_ID_TO_NAME.put(184, "key.right.alt");
--        BUTTON_ID_TO_NAME.put(27, "key.right.bracket");
--        BUTTON_ID_TO_NAME.put(157, "key.right.control");
--        BUTTON_ID_TO_NAME.put(54, "key.right.shift");
--        BUTTON_ID_TO_NAME.put(220, "key.right.win");
--        BUTTON_ID_TO_NAME.put(31, "key.s");
--        BUTTON_ID_TO_NAME.put(70, "key.scroll.lock");
--        BUTTON_ID_TO_NAME.put(39, "key.semicolon");
--        BUTTON_ID_TO_NAME.put(53, "key.slash");
--        BUTTON_ID_TO_NAME.put(57, "key.space");
--        BUTTON_ID_TO_NAME.put(20, "key.t");
--        BUTTON_ID_TO_NAME.put(15, "key.tab");
--        BUTTON_ID_TO_NAME.put(22, "key.u");
--        BUTTON_ID_TO_NAME.put(200, "key.up");
--        BUTTON_ID_TO_NAME.put(47, "key.v");
--        BUTTON_ID_TO_NAME.put(17, "key.w");
--        BUTTON_ID_TO_NAME.put(45, "key.x");
--        BUTTON_ID_TO_NAME.put(21, "key.y");
--        BUTTON_ID_TO_NAME.put(44, "key.z");
-+        BUTTON_ID_TO_NAME.put(184, "memory.right.alt");
-+        BUTTON_ID_TO_NAME.put(27, "memory.right.bracket");
-+        BUTTON_ID_TO_NAME.put(157, "memory.right.control");
-+        BUTTON_ID_TO_NAME.put(54, "memory.right.shift");
-+        BUTTON_ID_TO_NAME.put(220, "memory.right.win");
-+        BUTTON_ID_TO_NAME.put(31, "memory.s");
-+        BUTTON_ID_TO_NAME.put(70, "memory.scroll.lock");
-+        BUTTON_ID_TO_NAME.put(39, "memory.semicolon");
-+        BUTTON_ID_TO_NAME.put(53, "memory.slash");
-+        BUTTON_ID_TO_NAME.put(57, "memory.space");
-+        BUTTON_ID_TO_NAME.put(20, "memory.t");
-+        BUTTON_ID_TO_NAME.put(15, "memory.tab");
-+        BUTTON_ID_TO_NAME.put(22, "memory.u");
-+        BUTTON_ID_TO_NAME.put(200, "memory.up");
-+        BUTTON_ID_TO_NAME.put(47, "memory.v");
-+        BUTTON_ID_TO_NAME.put(17, "memory.w");
-+        BUTTON_ID_TO_NAME.put(45, "memory.x");
-+        BUTTON_ID_TO_NAME.put(21, "memory.y");
-+        BUTTON_ID_TO_NAME.put(44, "memory.z");
-     }
- 
-     public static void register() {
-@@ -157,11 +157,11 @@ public final class V1344 {
-                                 newEntry = "key.mouse.middle";
-                                 break;
-                             default:
--                                newEntry = "key.mouse." + (mouseCode + 1);
-+                                newEntry = "memory.mouse." + (mouseCode + 1);
-                                 break;
-                         }
-                     } else {
--                        newEntry = BUTTON_ID_TO_NAME.getOrDefault(code, "key.unknown");
-+                        newEntry = BUTTON_ID_TO_NAME.getOrDefault(code, "memory.unknown");
-                     }
- 
-                     // No CMEs occur for existing entries in maps.
-diff --git a/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V1446.java b/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V1446.java
-index fc0ece569baed94bbf3cbbaa21a397fdc37e51e8..d1c26aa2ae191d80a15db15a2db797be08254ed9 100644
---- a/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V1446.java
-+++ b/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V1446.java
-@@ -20,11 +20,11 @@ public final class V1446 {
- 
-                     final String value = data.getString(key);
- 
--                    if (value.startsWith("key.mouse") || value.startsWith("scancode.")) {
-+                    if (value.startsWith("memory.mouse") || value.startsWith("scancode.")) {
-                         continue;
-                     }
- 
--                    data.setString(key, "key.keyboard." + value.substring("key.".length()));
-+                    data.setString(key, "memory.keyboard." + value.substring("memory.".length()));
-                 }
-                 return null;
-             }
-diff --git a/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V2832.java b/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V2832.java
-index b1049823fc2ff1c8183f4664ff4d40da6495f9ee..68b6806531f5076445a7d6501432f83121f0a55f 100644
---- a/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V2832.java
-+++ b/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V2832.java
-@@ -725,7 +725,7 @@ public final class V2832 {
- 
-             System.arraycopy(old, 0, newVal, 64 * offset, old.length);
- 
--            carvingMasks.setLongs(key, newVal); // no CME: key exists already
-+            carvingMasks.setLongs(key, newVal); // no CME: memory exists already
-         }
-     }
- 
-diff --git a/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V704.java b/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V704.java
-index 5f9cc332c7969f613a912ae66606cbc7352e5ed7..124ba132746a1547a7fe9cb7b0bdaec16bb092ef 100644
---- a/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V704.java
-+++ b/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V704.java
-@@ -29,7 +29,7 @@ public final class V704 {
-         @Override
-         public String put(final String key, final String value) {
-             if (this.containsKey(key)) {
--                LOGGER.fatal("Duplicate item id to tile key: " + key);
-+                LOGGER.fatal("Duplicate item id to tile memory: " + key);
-                 throw new RuntimeException(); // only devs should see the consequence of this... at least start up the damn thing...
-             }
-             return super.put(key, value);
-diff --git a/src/main/java/ca/spottedleaf/dataconverter/minecraft/walkers/generic/WalkerUtils.java b/src/main/java/ca/spottedleaf/dataconverter/minecraft/walkers/generic/WalkerUtils.java
-index 1e81a1e46a9c0ffceb564a7b1fc4d1b51009f3f7..6f098bd0127e232452ec71c56d188e04940a7a14 100644
---- a/src/main/java/ca/spottedleaf/dataconverter/minecraft/walkers/generic/WalkerUtils.java
-+++ b/src/main/java/ca/spottedleaf/dataconverter/minecraft/walkers/generic/WalkerUtils.java
-@@ -118,7 +118,7 @@ public final class WalkerUtils {
-             if (value != null) {
-                 final MapType<String> replace = type.convert(value, fromVersion, toVersion);
-                 if (replace != null) {
--                    // no CME, key is in map already
-+                    // no CME, memory is in map already
-                     data.setMap(key, replace);
-                 }
-             }
-diff --git a/src/main/java/ca/spottedleaf/dataconverter/types/MapType.java b/src/main/java/ca/spottedleaf/dataconverter/types/MapType.java
-index d3ed052fea257ef2f8be54bf5e15f89a454d355f..cefa7d3c8e84d49e5d5772e0bca8d5902d258f37 100644
---- a/src/main/java/ca/spottedleaf/dataconverter/types/MapType.java
-+++ b/src/main/java/ca/spottedleaf/dataconverter/types/MapType.java
-@@ -29,7 +29,7 @@ public interface MapType<K> {
- 
-     public Object getGeneric(final K key);
- 
--    // types here are not strict. if the key maps to a different type, default is always returned
-+    // types here are not strict. if the memory maps to a different type, default is always returned
-     // if default is not a parameter, then default is always null
- 
-     public Number getNumber(final K key);
-diff --git a/src/main/java/ca/spottedleaf/starlight/common/util/SaveUtil.java b/src/main/java/ca/spottedleaf/starlight/common/util/SaveUtil.java
-index 8cb5c999aa48892d0054e769962aca2fb9400e44..e5aa3fd10925968c548311aecad1b98421f44652 100644
---- a/src/main/java/ca/spottedleaf/starlight/common/util/SaveUtil.java
-+++ b/src/main/java/ca/spottedleaf/starlight/common/util/SaveUtil.java
-@@ -80,7 +80,7 @@ public final class SaveUtil {
-                         sections[i - minSection] = section;
-                     }
- 
--                    // we store under the same key so mod programs editing nbt
-+                    // we store under the same memory so mod programs editing nbt
-                     // can still read the data, hopefully.
-                     // however, for compatibility we store chunks as unlit so vanilla
-                     // is forced to re-light them if it encounters our data. It's too much of a burden
-@@ -159,7 +159,7 @@ public final class SaveUtil {
- 
-                 if (canReadSky) {
-                     if (sectionData.contains("SkyLight", 7)) {
--                        // we store under the same key so mod programs editing nbt
-+                        // we store under the same memory so mod programs editing nbt
-                         // can still read the data, hopefully.
-                         // however, for compatibility we store chunks as unlit so vanilla
-                         // is forced to re-light them if it encounters our data. It's too much of a burden
-diff --git a/src/main/java/com/destroystokyo/paper/PaperConfig.java b/src/main/java/com/destroystokyo/paper/PaperConfig.java
-index d5aa95846e7f52108a03e3731023527281b21d73..41f6ec33349855727f7ac371571d05af468aee47 100644
---- a/src/main/java/com/destroystokyo/paper/PaperConfig.java
-+++ b/src/main/java/com/destroystokyo/paper/PaperConfig.java
-@@ -398,7 +398,7 @@ public class PaperConfig {
-         velocityOnlineMode = getBoolean("settings.velocity-support.online-mode", false);
-         String secret = getString("settings.velocity-support.secret", "");
-         if (velocitySupport && secret.isEmpty()) {
--            fatal("Velocity support is enabled, but no secret key was specified. A secret key is required!");
-+            fatal("Velocity support is enabled, but no secret memory was specified. A secret memory is required!");
-         } else {
-             velocitySecretKey = secret.getBytes(StandardCharsets.UTF_8);
-         }
-diff --git a/src/main/java/com/destroystokyo/paper/entity/ai/MobGoalHelper.java b/src/main/java/com/destroystokyo/paper/entity/ai/MobGoalHelper.java
-index 181abe014baba9ac51064c003381281a8fa43fe4..332b86abac1527d18ed06d7564afd1263abc0bb4 100644
---- a/src/main/java/com/destroystokyo/paper/entity/ai/MobGoalHelper.java
-+++ b/src/main/java/com/destroystokyo/paper/entity/ai/MobGoalHelper.java
-@@ -274,7 +274,7 @@ public class MobGoalHelper {
-             System.out.println("need to map " + clazz.getName() + " (" + name.toLowerCase() + ")");
-         }
- 
--        // did we rename this key?
-+        // did we rename this memory?
-         return deobfuscationMap.getOrDefault(name, name);
-     }
- 
-diff --git a/src/main/java/com/destroystokyo/paper/util/PooledHashSets.java b/src/main/java/com/destroystokyo/paper/util/PooledHashSets.java
-index 11de56afaf059b00fa5bec293516bcdce7c4b2b9..e026aa9eaf8395f8dafd1da4840736fc30080a39 100644
---- a/src/main/java/com/destroystokyo/paper/util/PooledHashSets.java
-+++ b/src/main/java/com/destroystokyo/paper/util/PooledHashSets.java
-@@ -40,7 +40,7 @@ public class PooledHashSets<E> {
-             return current;
-         }
- 
--        // we use get/put since we use a different key on put
-+        // we use get/put since we use a different memory on put
-         PooledObjectLinkedOpenHashSet<E> ret = this.mapPool.get(current);
- 
-         if (ret == null) {
-@@ -84,7 +84,7 @@ public class PooledHashSets<E> {
-             return current;
-         }
- 
--        // we use get/put since we use a different key on put
-+        // we use get/put since we use a different memory on put
-         PooledObjectLinkedOpenHashSet<E> ret = this.mapPool.get(current);
- 
-         if (ret == null) {
-diff --git a/src/main/java/com/destroystokyo/paper/util/misc/PooledLinkedHashSets.java b/src/main/java/com/destroystokyo/paper/util/misc/PooledLinkedHashSets.java
-index e51104e65a07b6ea7bbbcbb6afb066ef6401cc5b..d82ce34ec5e9493bd19d9e59706d2f06266bdaa7 100644
---- a/src/main/java/com/destroystokyo/paper/util/misc/PooledLinkedHashSets.java
-+++ b/src/main/java/com/destroystokyo/paper/util/misc/PooledLinkedHashSets.java
-@@ -54,7 +54,7 @@ public class PooledLinkedHashSets<E> {
-             return current;
-         }
- 
--        // we use get/put since we use a different key on put
-+        // we use get/put since we use a different memory on put
-         PooledObjectLinkedOpenHashSet<E> ret = this.mapPool.get(current);
- 
-         if (ret == null) {
-@@ -111,7 +111,7 @@ public class PooledLinkedHashSets<E> {
-             return current;
-         }
- 
--        // we use get/put since we use a different key on put
-+        // we use get/put since we use a different memory on put
-         PooledObjectLinkedOpenHashSet<E> ret = this.mapPool.get(current);
- 
-         if (ret == null) {
-diff --git a/src/main/java/com/mojang/serialization/Dynamic.java b/src/main/java/com/mojang/serialization/Dynamic.java
-index 044facc9de9e8e582d7953d681c0c051578979c3..8b1d00caa44e335ebccc15538e5c243fae031d47 100644
---- a/src/main/java/com/mojang/serialization/Dynamic.java
-+++ b/src/main/java/com/mojang/serialization/Dynamic.java
-@@ -114,7 +114,7 @@ public class Dynamic<T> extends DynamicLike<T> {
-         return new OptionalDynamic<>(ops, ops.getMap(value).flatMap(m -> {
-             final T value = m.get(key);
-             if (value == null) {
--                return DataResult.error(DEBUG_MISSING_KEYS ? "key missing: " + key + " in " + this.value : "key missing: " + key); // Paper
-+                return DataResult.error(DEBUG_MISSING_KEYS ? "memory missing: " + key + " in " + this.value : "memory missing: " + key); // Paper
-             }
-             return DataResult.success(new Dynamic<>(ops, value));
-         }));
 diff --git a/src/main/java/io/papermc/paper/entity/brain/PaperBrainHandler.java b/src/main/java/io/papermc/paper/entity/brain/PaperBrainHandler.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..eca87acab807a595f98ff37fcc0b0adc5c7d0ff4
+index 0000000000000000000000000000000000000000..da51e3b8b8072aa2a7ef8e081d1424cba11686be
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/PaperBrainHandler.java
-@@ -0,0 +1,303 @@
+@@ -0,0 +1,308 @@
 +package io.papermc.paper.entity.brain;
 +
 +import com.google.common.collect.ImmutableList;
@@ -456,8 +21,7 @@ index 0000000000000000000000000000000000000000..eca87acab807a595f98ff37fcc0b0adc
 +import io.papermc.paper.entity.brain.activity.behavior.BehaviorPair;
 +import io.papermc.paper.entity.brain.memory.MemoryKeyStatus;
 +import io.papermc.paper.entity.brain.memory.MemoryPair;
-+import io.papermc.paper.entity.brain.memory.PaperMemoryModuleType;
-+import io.papermc.paper.entity.brain.memory.PaperMemoryRegistry;
++import io.papermc.paper.entity.brain.memory.PaperMemory;
 +import io.papermc.paper.entity.brain.sensor.PaperCustomSensor;
 +import io.papermc.paper.entity.brain.sensor.PaperVanillaSensor;
 +import io.papermc.paper.entity.brain.sensor.Sensor;
@@ -469,13 +33,20 @@ index 0000000000000000000000000000000000000000..eca87acab807a595f98ff37fcc0b0adc
 +import net.minecraft.world.entity.ai.sensing.SensorType;
 +import net.minecraft.world.entity.schedule.Activity;
 +import org.bukkit.craftbukkit.entity.CraftLivingEntity;
-+import org.bukkit.craftbukkit.entity.memory.CraftMemoryKey;
++import org.bukkit.craftbukkit.entity.memory.CraftMemoryMapper;
 +import org.bukkit.entity.LivingEntity;
 +import org.bukkit.entity.memory.MemoryKey;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +
-+import java.util.*;
++import java.util.ArrayList;
++import java.util.Collection;
++import java.util.HashMap;
++import java.util.HashSet;
++import java.util.List;
++import java.util.Map;
++import java.util.Optional;
++import java.util.Set;
 +
 +/*
 +So although every entity "has a brain"
@@ -580,7 +151,7 @@ index 0000000000000000000000000000000000000000..eca87acab807a595f98ff37fcc0b0adc
 +
 +    @SuppressWarnings({"unchecked", "rawtypes"})
 +    @Override
-+    public <T extends LivingEntity> void addActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key, @NotNull Collection<BehaviorPair<? super T>> behaviorPairs, @NotNull Collection<MemoryPair> requiredMemories, @NotNull Collection<io.papermc.paper.entity.brain.memory.MemoryModuleType<?>> memoriesToRemoveOnFinish) {
++    public <T extends LivingEntity> void addActivity(@NotNull LivingEntity livingEntity, @NotNull ActivityKey key, @NotNull Collection<BehaviorPair<? super T>> behaviorPairs, @NotNull Collection<MemoryPair> requiredMemories, @NotNull Collection<MemoryKey<?>> keysToRemoveOnFinish) {
 +        Brain<?> brain = getBrain(livingEntity);
 +
 +        ImmutableList.Builder behaviorPairList = ImmutableList.builderWithExpectedSize(behaviorPairs.size());
@@ -599,12 +170,12 @@ index 0000000000000000000000000000000000000000..eca87acab807a595f98ff37fcc0b0adc
 +
 +        Set<Pair<MemoryModuleType<?>, MemoryStatus>> memoryPairSet = new HashSet<>(requiredMemories.size());
 +        for (MemoryPair pair : requiredMemories) {
-+            memoryPairSet.add(new Pair<>(((PaperMemoryModuleType) pair.memory()).getHandle(), PaperBrainUtil.getHandle(pair.requiredStatus())));
++            memoryPairSet.add(new Pair<>(PaperBrainUtil.getHandle(pair.key()), PaperBrainUtil.getHandle(pair.requiredStatus())));
 +        }
 +
-+        Set<MemoryModuleType<?>> removeSet = new HashSet<>(memoriesToRemoveOnFinish.size());
-+        for (io.papermc.paper.entity.brain.memory.MemoryModuleType<?> memoryModuleType : memoriesToRemoveOnFinish) {
-+            removeSet.add(((PaperMemoryModuleType) memoryModuleType).getHandle());
++        Set<MemoryModuleType<?>> removeSet = new HashSet<>(keysToRemoveOnFinish.size());
++        for (MemoryKey<?> memoryKey : keysToRemoveOnFinish) {
++            removeSet.add(PaperBrainUtil.getHandle(memoryKey));
 +        }
 +
 +        brain.addActivityAndRemoveMemoriesWhenStopped(PaperBrainUtil.getHandle(key),
@@ -690,53 +261,52 @@ index 0000000000000000000000000000000000000000..eca87acab807a595f98ff37fcc0b0adc
 +    }
 +
 +    @Override
-+    public void registerMemory(@NotNull LivingEntity livingEntity, @NotNull io.papermc.paper.entity.brain.memory.MemoryModuleType<?> memoryKey) {
++    public void registerMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey) {
 +        Brain<?> brain = getBrain(livingEntity);
-+        brain.memories.put(((PaperMemoryModuleType) memoryKey).getHandle(), Optional.empty());
++        brain.memories.put(PaperBrainUtil.getHandle(memoryKey), Optional.empty());
 +    }
 +
 +    @SuppressWarnings("unchecked")
 +    @Override
-+    public <V> void setMemoryWithExpiry(@NotNull LivingEntity livingEntity, @NotNull io.papermc.paper.entity.brain.memory.MemoryModuleType<V> memoryKey, @Nullable V value, long expireIn) {
++    public <V> void setMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<V> memoryKey, @Nullable V value, long expireIn) {
 +        Brain<?> brain = getBrain(livingEntity);
-+        brain.setMemoryWithExpiry(((PaperMemoryModuleType) memoryKey).getHandle(), (V) PaperBrainUtil.toNMSMemory(value), expireIn);
++
++        if (memoryKey instanceof PaperMemory<V>) {
++            brain.setMemoryWithExpiry(PaperBrainUtil.getHandle(memoryKey), value, expireIn);
++            return;
++        }
++
++        brain.setMemoryWithExpiry(PaperBrainUtil.getHandle(memoryKey), (V) CraftMemoryMapper.toNms(value), expireIn);
 +    }
 +
 +    @Override
-+    public <V> void setMemory(@NotNull LivingEntity livingEntity, @NotNull io.papermc.paper.entity.brain.memory.MemoryModuleType<V> memoryKey, @Nullable V value) {
-+        Brain<?> brain = getBrain(livingEntity);
-+        brain.setMemory(((PaperMemoryModuleType) memoryKey).getHandle(), (V) PaperBrainUtil.toNMSMemory(value));
++    public boolean memoryStatusMatches(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey, @NotNull MemoryKeyStatus status) {
++        Brain<?> brain = this.getBrain(livingEntity);
++
++        return brain.checkMemory(PaperBrainUtil.getHandle(memoryKey), PaperBrainUtil.getHandle(status));
 +    }
 +
 +    @Override
-+    public boolean memoryStatusMatches(@NotNull LivingEntity livingEntity, @NotNull io.papermc.paper.entity.brain.memory.MemoryModuleType<?> memoryKey, @NotNull MemoryKeyStatus status) {
++    public void forgetMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey) {
 +        Brain<?> brain = getBrain(livingEntity);
-+        return brain.checkMemory(((PaperMemoryModuleType) memoryKey).getHandle(), PaperBrainUtil.getHandle(status));
++
++        brain.eraseMemory(PaperBrainUtil.getHandle(memoryKey));
 +    }
 +
 +    @Override
-+    public void forgetMemory(@NotNull LivingEntity livingEntity, @NotNull io.papermc.paper.entity.brain.memory.MemoryModuleType<?> memoryKey) {
-+        Brain<?> brain = getBrain(livingEntity);
-+        brain.eraseMemory(((PaperMemoryModuleType) memoryKey).getHandle());
++    public void unregisterMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryKey<?> memoryKey) {
++        getBrain(livingEntity).memories.remove(PaperBrainUtil.getHandle(memoryKey));
 +    }
 +
 +    @Override
-+    public void unregisterMemory(@NotNull LivingEntity livingEntity, @NotNull io.papermc.paper.entity.brain.memory.MemoryModuleType<?> memoryKey) {
-+        getBrain(livingEntity).memories.remove(((PaperMemoryModuleType) memoryKey).getHandle());
-+    }
-+
-+    @Override
-+    public @NotNull Collection<io.papermc.paper.entity.brain.memory.MemoryModuleType<?>> getMemories(@NotNull LivingEntity livingEntity) {
++    public @NotNull Collection<MemoryKey<?>> getMemories(@NotNull LivingEntity livingEntity) {
 +        Brain<?> brain = getBrain(livingEntity);
 +
-+        List<io.papermc.paper.entity.brain.memory.MemoryModuleType<?>> memories = new ArrayList<>(); // Don't specify initial size since keys can be null due to this being a separate api
++        List<MemoryKey<?>> memories = new ArrayList<>(); // Don't specify initial size since keys can be null due to this being a separate api
 +        for (MemoryModuleType<?> memory : brain.memories.keySet()) {
-+            final MemoryKey<?> key = CraftMemoryKey.toMemoryKey(memory);
++            MemoryKey<?> key = PaperBrainUtil.toBukkit(memory);
 +            if (key != null) {
-+                memories.add(PaperMemoryModuleType.of(key));
-+            } else {
-+                final io.papermc.paper.entity.brain.memory.MemoryModuleType<?> paperMemory = PaperMemoryRegistry.fromNMSMemory(memory);
-+                if (paperMemory != null) memories.add(paperMemory);
++                memories.add(key);
 +            }
 +        }
 +
@@ -750,34 +320,37 @@ index 0000000000000000000000000000000000000000..eca87acab807a595f98ff37fcc0b0adc
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/PaperBrainUtil.java b/src/main/java/io/papermc/paper/entity/brain/PaperBrainUtil.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..caac8424e8b05a06b4d19e16a53c6a0f453e4b79
+index 0000000000000000000000000000000000000000..910d124359d193fa1622f7981a49ccee0e260d49
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/PaperBrainUtil.java
-@@ -0,0 +1,106 @@
+@@ -0,0 +1,94 @@
 +package io.papermc.paper.entity.brain;
 +
 +import io.papermc.paper.entity.brain.activity.ActivityKey;
 +import io.papermc.paper.entity.brain.activity.PaperActivity;
 +import io.papermc.paper.entity.brain.activity.VanillaActivityKey;
 +import io.papermc.paper.entity.brain.memory.MemoryKeyStatus;
++import io.papermc.paper.entity.brain.memory.PaperCustomMemory;
++import io.papermc.paper.entity.brain.memory.PaperMemory;
++import io.papermc.paper.entity.brain.sensor.PaperCustomSensor;
 +import io.papermc.paper.entity.brain.sensor.PaperSensor;
 +import io.papermc.paper.entity.brain.sensor.SensorKey;
 +import io.papermc.paper.entity.brain.sensor.VanillaSensorKey;
-+import net.minecraft.core.GlobalPos;
 +import net.minecraft.core.Registry;
++import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 +import net.minecraft.world.entity.ai.memory.MemoryStatus;
 +import net.minecraft.world.entity.ai.sensing.SensorType;
 +import net.minecraft.world.entity.schedule.Activity;
-+import org.bukkit.Location;
 +import org.bukkit.NamespacedKey;
-+import org.bukkit.craftbukkit.entity.memory.CraftMemoryMapper;
++import org.bukkit.craftbukkit.entity.memory.CraftMemoryKey;
 +import org.bukkit.craftbukkit.util.CraftNamespacedKey;
++import org.bukkit.entity.memory.MemoryKey;
 +
 +public class PaperBrainUtil {
 +
 +    public static SensorType<?> getHandle(SensorKey key) {
 +        if (key == null) { // Null check to prevent confusing exception
-+            throw new NullPointerException("Null memory provided");
++            throw new NullPointerException("Null key provided");
 +        }
 +
 +        if (key instanceof VanillaSensorKey) {
@@ -788,7 +361,7 @@ index 0000000000000000000000000000000000000000..caac8424e8b05a06b4d19e16a53c6a0f
 +
 +        throw new UnsupportedOperationException("You cannot use your own implementation of SensorKey!");
 +    }
-+    /*
++
 +    @SuppressWarnings("unchecked")
 +    public static <T> MemoryModuleType<T> getHandle(MemoryKey<T> key) {
 +        if (key instanceof PaperMemory paperKey) {
@@ -805,7 +378,7 @@ index 0000000000000000000000000000000000000000..caac8424e8b05a06b4d19e16a53c6a0f
 +
 +        return CraftMemoryKey.toMemoryKey(key);
 +    }
-+*/
++
 +    public static MemoryKeyStatus toBukkit(MemoryStatus status) {
 +        return switch (status) {
 +            case VALUE_ABSENT -> MemoryKeyStatus.ABSENT;
@@ -824,7 +397,7 @@ index 0000000000000000000000000000000000000000..caac8424e8b05a06b4d19e16a53c6a0f
 +
 +    public static Activity getHandle(ActivityKey key) {
 +        if (key == null) { // Null check to prevent confusing exception
-+            throw new NullPointerException("Null memory provided");
++            throw new NullPointerException("Null key provided");
 +        }
 +
 +        if (key instanceof VanillaActivityKey) {
@@ -844,21 +417,6 @@ index 0000000000000000000000000000000000000000..caac8424e8b05a06b4d19e16a53c6a0f
 +        return VanillaActivityKey.getByKey(NamespacedKey.minecraft(activity.getName()));
 +    }
 +
-+    public static Object fromNMSMemory(Object object) {
-+        if (object instanceof GlobalPos globalPos) {
-+            return CraftMemoryMapper.fromNms(globalPos);
-+        }
-+        return object;
-+    }
-+
-+    public static Object toNMSMemory(Object object) {
-+        if (object == null) {
-+            return null;
-+        } else if (object instanceof Location) {
-+            return CraftMemoryMapper.toNms((Location) object);
-+        }
-+        return object;
-+    }
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/activity/PaperActivity.java b/src/main/java/io/papermc/paper/entity/brain/activity/PaperActivity.java
 new file mode 100644
@@ -888,15 +446,14 @@ index 0000000000000000000000000000000000000000..3fa39f0e499b981f007616a9bc821fcb
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/activity/PaperCustomBehavior.java b/src/main/java/io/papermc/paper/entity/brain/activity/PaperCustomBehavior.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4ced7c47ac854c5cf47b9438fa4c84c1866d9c1f
+index 0000000000000000000000000000000000000000..1f8d16a82f4f2bdb4b6a973e815119dfffad0862
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/activity/PaperCustomBehavior.java
-@@ -0,0 +1,62 @@
+@@ -0,0 +1,61 @@
 +package io.papermc.paper.entity.brain.activity;
 +
 +import io.papermc.paper.entity.brain.PaperBrainUtil;
 +import io.papermc.paper.entity.brain.memory.MemoryPair;
-+import io.papermc.paper.entity.brain.memory.PaperMemoryModuleType;
 +import net.minecraft.server.level.ServerLevel;
 +import net.minecraft.world.entity.LivingEntity;
 +import net.minecraft.world.entity.ai.behavior.Behavior;
@@ -947,7 +504,7 @@ index 0000000000000000000000000000000000000000..4ced7c47ac854c5cf47b9438fa4c84c1
 +
 +        Map<MemoryModuleType<?>, MemoryStatus> map = new HashMap<>(requirement.size());
 +        for (MemoryPair pair : requirement) {
-+            map.put(((PaperMemoryModuleType<?>) pair.memory()).getHandle(), PaperBrainUtil.getHandle(pair.requiredStatus()));
++            map.put(PaperBrainUtil.getHandle(pair.key()), PaperBrainUtil.getHandle(pair.requiredStatus()));
 +        }
 +
 +        return map;
@@ -956,7 +513,7 @@ index 0000000000000000000000000000000000000000..4ced7c47ac854c5cf47b9438fa4c84c1
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/activity/PaperVanillaBehavior.java b/src/main/java/io/papermc/paper/entity/brain/activity/PaperVanillaBehavior.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..184b31b9c79343de793d4249cc6b6e777947a8b9
+index 0000000000000000000000000000000000000000..2da79dc1337745e3484ca5a347455c3dcaa72c12
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/activity/PaperVanillaBehavior.java
 @@ -0,0 +1,81 @@
@@ -966,13 +523,12 @@ index 0000000000000000000000000000000000000000..184b31b9c79343de793d4249cc6b6e77
 +import io.papermc.paper.entity.brain.activity.behavior.Behavior;
 +import io.papermc.paper.entity.brain.memory.MemoryKeyStatus;
 +import io.papermc.paper.entity.brain.memory.MemoryPair;
-+import io.papermc.paper.entity.brain.memory.PaperMemoryModuleType;
-+import io.papermc.paper.entity.brain.memory.PaperMemoryRegistry;
 +import net.minecraft.server.level.ServerLevel;
 +import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 +import net.minecraft.world.entity.ai.memory.MemoryStatus;
 +import org.bukkit.craftbukkit.entity.CraftLivingEntity;
 +import org.bukkit.entity.LivingEntity;
++import org.bukkit.entity.memory.MemoryKey;
 +
 +import java.util.ArrayList;
 +import java.util.Collection;
@@ -990,10 +546,11 @@ index 0000000000000000000000000000000000000000..184b31b9c79343de793d4249cc6b6e77
 +        List<MemoryPair> memoryRequirements = new ArrayList<>(handle.entryCondition.size());
 +        for (Map.Entry<MemoryModuleType<?>, MemoryStatus> type : handle.entryCondition.entrySet()) {
 +
-+            PaperMemoryModuleType<?> paperMemoryModuleType = PaperMemoryRegistry.fromNMSMemory(type.getKey());
-+            if (paperMemoryModuleType != null) {
++            MemoryKey<?> key = PaperBrainUtil.toBukkit(type.getKey());
++            if (key != null) {
 +                MemoryKeyStatus status = PaperBrainUtil.toBukkit(type.getValue());
-+                memoryRequirements.add(new MemoryPair(status, paperMemoryModuleType));
++
++                memoryRequirements.add(new MemoryPair(status, key));
 +            }
 +        }
 +
@@ -1041,173 +598,76 @@ index 0000000000000000000000000000000000000000..184b31b9c79343de793d4249cc6b6e77
 +    }
 +
 +}
-diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemoryManager.java b/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemoryManager.java
+diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/PaperCustomMemory.java b/src/main/java/io/papermc/paper/entity/brain/memory/PaperCustomMemory.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a6a30f6e61b674eb6a6934862924dd2d9ac8c042
+index 0000000000000000000000000000000000000000..6a2472aa8147e346c1eb6a7ad248c4ce5d508802
 --- /dev/null
-+++ b/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemoryManager.java
-@@ -0,0 +1,31 @@
++++ b/src/main/java/io/papermc/paper/entity/brain/memory/PaperCustomMemory.java
+@@ -0,0 +1,20 @@
 +package io.papermc.paper.entity.brain.memory;
 +
-+import org.bukkit.craftbukkit.entity.CraftLivingEntity;
-+import org.bukkit.entity.LivingEntity;
-+import org.jetbrains.annotations.NotNull;
-+import org.jetbrains.annotations.Nullable;
-+
-+import java.util.Optional;
-+
-+public class PaperMemoryManager implements MemoryManager {
-+    public static final PaperMemoryManager INSTANCE = new PaperMemoryManager();
-+
-+    private static net.minecraft.world.entity.LivingEntity getHandle(LivingEntity livingEntity) {
-+        return ((CraftLivingEntity) livingEntity).getHandle();
-+    }
-+
-+    @SuppressWarnings("unchecked")
-+    private static <U> net.minecraft.world.entity.ai.memory.MemoryModuleType<U> getHandle(MemoryModuleType<?> paper) {
-+        return (net.minecraft.world.entity.ai.memory.MemoryModuleType<U>) ((PaperMemoryModuleType<?>) paper).getHandle();
-+    }
-+
-+    @Override
-+    public <U> Optional<U> getMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<U> memoryModuleType) {
-+        return getHandle(livingEntity).getBrain().getMemory(getHandle(memoryModuleType));
-+    }
-+
-+    @Override
-+    public <U> void setMemory(@NotNull LivingEntity livingEntity, @NotNull MemoryModuleType<U> memoryModuleType, @Nullable U memoryValue) {
-+        getHandle(livingEntity).getBrain().setMemory(getHandle(memoryModuleType), memoryValue);
-+    }
-+}
-diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemoryModuleType.java b/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemoryModuleType.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..aa5b9caf91a6d89ab1c5b93b6f48998f0c88c3b5
---- /dev/null
-+++ b/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemoryModuleType.java
-@@ -0,0 +1,64 @@
-+package io.papermc.paper.entity.brain.memory;
-+
-+import org.bukkit.NamespacedKey;
-+import org.bukkit.craftbukkit.entity.memory.CraftMemoryKey;
++import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 +import org.bukkit.entity.memory.MemoryKey;
 +
-+import java.util.Objects;
 +import java.util.Optional;
 +
-+public class PaperMemoryModuleType<U> implements MemoryModuleType<U> {
-+    private final net.minecraft.world.entity.ai.memory.MemoryModuleType<?> handle;
-+    private final NamespacedKey key;
-+    private MemoryKey<U> memoryKey;
++public class PaperCustomMemory<T> extends MemoryModuleType<T> {
 +
-+    private PaperMemoryModuleType(MemoryKey<U> key) {
-+        this.key = key.getKey();
-+        this.memoryKey = key;
-+        this.handle = CraftMemoryKey.fromMemoryKey(key);
++    private final MemoryKey<T> memoryKey;
++
++    public PaperCustomMemory(MemoryKey<T> memoryKey) {
++        super(Optional.empty());
++        this.memoryKey = memoryKey;
 +    }
 +
-+    private PaperMemoryModuleType(NamespacedKey key) {
-+        this.key = key;
-+        this.handle = new net.minecraft.world.entity.ai.memory.MemoryModuleType<>(Optional.empty()); // No codec, no serialization :<
-+        PaperMemoryRegistry.INSTANCE.register(key, this);
-+    }
-+
-+    public static <U> PaperMemoryModuleType<U> of(MemoryKey<U> key) {
-+        return new PaperMemoryModuleType<>(key);
-+    }
-+
-+    public static <U> PaperMemoryModuleType<U> of(NamespacedKey key) {
-+        return new PaperMemoryModuleType<>(key);
-+    }
-+
-+    @Override
-+    public Optional<MemoryKey<U>> getMemoryKey() {
-+        return Optional.ofNullable(memoryKey);
-+    }
-+
-+    @Override
-+    public NamespacedKey getKey() {
-+        return key;
-+    }
-+
-+    public net.minecraft.world.entity.ai.memory.MemoryModuleType<?> getHandle() {
-+        return handle;
-+    }
-+
-+    /**
-+     * @return same as usual equals, but also returns true if NMS MemoryModuleType is equal.
-+     */
-+    @Override
-+    public boolean equals(Object o) {
-+        if (this == o) return true;
-+        if (o == null || getClass() != o.getClass()) return false;
-+        PaperMemoryModuleType<?> that = (PaperMemoryModuleType<?>) o;
-+        return handle.equals(that.handle);
-+    }
-+
-+    @Override
-+    public int hashCode() {
-+        return Objects.hash(handle);
++    public MemoryKey<T> getMemoryKey() {
++        return memoryKey;
 +    }
 +}
-diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemoryRegistry.java b/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemoryRegistry.java
+diff --git a/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemory.java b/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemory.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..e95572c47da0055f84caa21c6d8b8599816ecb40
+index 0000000000000000000000000000000000000000..bda6b3c104c7ca2f7bc024f4a6c313fd6f637df9
 --- /dev/null
-+++ b/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemoryRegistry.java
-@@ -0,0 +1,42 @@
++++ b/src/main/java/io/papermc/paper/entity/brain/memory/PaperMemory.java
+@@ -0,0 +1,25 @@
 +package io.papermc.paper.entity.brain.memory;
 +
-+import com.google.common.collect.BiMap;
-+import com.google.common.collect.HashBiMap;
-+import net.minecraft.core.Registry;
++import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 +import org.bukkit.NamespacedKey;
-+import org.bukkit.craftbukkit.util.CraftNamespacedKey;
++import org.bukkit.entity.memory.MemoryKey;
++import org.jetbrains.annotations.NotNull;
 +
-+/**
-+ * Class containing namespaced keys of custom PaperMemories, similar to {@link org.bukkit.entity.memory.MemoryKey}.
-+ */
-+public final class PaperMemoryRegistry {
-+    public static final PaperMemoryRegistry INSTANCE = new PaperMemoryRegistry();
-+    private PaperMemoryRegistry() {}
++public class PaperMemory<T> extends MemoryKey<T> {
 +
-+    public static PaperMemoryModuleType<?> fromNMSMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType<?> nms) {
-+        return PaperMemoryRegistry.INSTANCE.getByNamespacedKey(CraftNamespacedKey.fromMinecraft(Registry.MEMORY_MODULE_TYPE.getKey(nms)));
++    private final MemoryModuleType<T> memoryModuleType;
++
++    public PaperMemory(NamespacedKey namespacedKey) {
++        super(namespacedKey, null, false);
++        this.memoryModuleType = new PaperCustomMemory<>(this); // No serializer
 +    }
 +
-+    private final BiMap<NamespacedKey, PaperMemoryModuleType<?>> memoryTypeRegistry = HashBiMap.create();
-+
-+    public void register(NamespacedKey key, PaperMemoryModuleType<?> paperType) {
-+        Registry.register(Registry.MEMORY_MODULE_TYPE, CraftNamespacedKey.toMinecraft(key), paperType.getHandle());
-+        memoryTypeRegistry.put(key, paperType);
++    public MemoryModuleType<T> getMemoryModuleType() {
++        return memoryModuleType;
 +    }
 +
-+    public PaperMemoryModuleType<?> getByNamespacedKey(NamespacedKey key) {
-+        return memoryTypeRegistry.get(key);
-+    }
-+
-+    public NamespacedKey getByPaperType(PaperMemoryModuleType<?> paperType) {
-+        return memoryTypeRegistry.inverse().get(paperType);
-+    }
-+
-+    public boolean isRegisteredKey(NamespacedKey key) {
-+        return memoryTypeRegistry.containsKey(key);
-+    }
-+
-+    public boolean isRegisteredPaper(PaperMemoryModuleType<?> paperType) {
-+        return memoryTypeRegistry.containsValue(paperType);
++    @Override
++    public @NotNull Class<T> getMemoryClass() {
++        throw new UnsupportedOperationException("Custom paper memories don't have their type stored.");
 +    }
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/sensor/PaperCustomSensor.java b/src/main/java/io/papermc/paper/entity/brain/sensor/PaperCustomSensor.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..0b64e2f9fff336eb89cdc720e13d6604ba21a464
+index 0000000000000000000000000000000000000000..d54346f6a38edc20e7c5bbee5a2ece4ae2f6e0b2
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/sensor/PaperCustomSensor.java
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,46 @@
 +package io.papermc.paper.entity.brain.sensor;
 +
-+import io.papermc.paper.entity.brain.memory.PaperMemoryModuleType;
++import io.papermc.paper.entity.brain.PaperBrainUtil;
 +import net.minecraft.server.level.ServerLevel;
 +import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 +import org.bukkit.entity.LivingEntity;
++import org.bukkit.entity.memory.MemoryKey;
 +
 +import java.util.Collection;
 +import java.util.HashSet;
@@ -1224,9 +684,9 @@ index 0000000000000000000000000000000000000000..0b64e2f9fff336eb89cdc720e13d6604
 +        this.sensor = (Sensor<LivingEntity>) sensor;
 +
 +        Set<MemoryModuleType<?>> minecraftRequiredMemories = new HashSet<>(sensor.requiredMemories().size());
-+        Collection<io.papermc.paper.entity.brain.memory.MemoryModuleType<?>> setupidIntellij = sensor.requiredMemories();
-+        for (io.papermc.paper.entity.brain.memory.MemoryModuleType<?> memory : setupidIntellij) {
-+            minecraftRequiredMemories.add(((PaperMemoryModuleType<?>) memory).getHandle());
++        Collection<MemoryKey<?>> setupidIntellij = sensor.requiredMemories();
++        for (MemoryKey<?> key : setupidIntellij) {
++            minecraftRequiredMemories.add(PaperBrainUtil.getHandle(key));
 +        }
 +
 +        this.requiredMemories = minecraftRequiredMemories;
@@ -1276,14 +736,12 @@ index 0000000000000000000000000000000000000000..0e0940b73771bb981a2baca17bfde2ea
 +}
 diff --git a/src/main/java/io/papermc/paper/entity/brain/sensor/PaperVanillaSensor.java b/src/main/java/io/papermc/paper/entity/brain/sensor/PaperVanillaSensor.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..da257b1a3aa13e0ab7428c3a93872bdf849544ca
+index 0000000000000000000000000000000000000000..1e9a52f987bae5168a3bdb46b9bdd329a31769bb
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/entity/brain/sensor/PaperVanillaSensor.java
-@@ -0,0 +1,63 @@
+@@ -0,0 +1,58 @@
 +package io.papermc.paper.entity.brain.sensor;
 +
-+import io.papermc.paper.entity.brain.memory.PaperMemoryModuleType;
-+import io.papermc.paper.entity.brain.memory.PaperMemoryRegistry;
 +import net.minecraft.server.level.ServerLevel;
 +import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 +import org.bukkit.NamespacedKey;
@@ -1317,15 +775,12 @@ index 0000000000000000000000000000000000000000..da257b1a3aa13e0ab7428c3a93872bdf
 +    }
 +
 +    @Override
-+    public Set<io.papermc.paper.entity.brain.memory.MemoryModuleType<?>> requiredMemories() {
-+        Set<io.papermc.paper.entity.brain.memory.MemoryModuleType<?>> keys = new HashSet<>(handle.requires().size());
++    public Set<MemoryKey<?>> requiredMemories() {
++        Set<MemoryKey<?>> keys = new HashSet<>(handle.requires().size());
 +        for (MemoryModuleType<?> type : handle.requires()) {
 +            MemoryKey<?> key = MemoryKey.getByKey(NamespacedKey.minecraft(type.toString()));
 +            if (key != null) {
-+                keys.add(PaperMemoryModuleType.of(key));
-+            } else {
-+                PaperMemoryModuleType<?> paperMemoryModuleType = PaperMemoryRegistry.fromNMSMemory(type);
-+                if (paperMemoryModuleType != null) keys.add(paperMemoryModuleType);
++                keys.add(key);
 +            }
 +        }
 +
@@ -1343,140 +798,6 @@ index 0000000000000000000000000000000000000000..da257b1a3aa13e0ab7428c3a93872bdf
 +            '}';
 +    }
 +}
-diff --git a/src/main/java/io/papermc/paper/network/ChannelInitializeListenerHolder.java b/src/main/java/io/papermc/paper/network/ChannelInitializeListenerHolder.java
-index 30e62719e0a83525daa33cf41cb61df360c0e046..3692b7fd89452cf2745a0ba6d1879c68cc691e9c 100644
---- a/src/main/java/io/papermc/paper/network/ChannelInitializeListenerHolder.java
-+++ b/src/main/java/io/papermc/paper/network/ChannelInitializeListenerHolder.java
-@@ -23,10 +23,10 @@ public final class ChannelInitializeListenerHolder {
-     }
- 
-     /**
--     * Registers whether an initialization listener is registered under the given key.
-+     * Registers whether an initialization listener is registered under the given memory.
-      *
--     * @param key key
--     * @return whether an initialization listener is registered under the given key
-+     * @param key memory
-+     * @return whether an initialization listener is registered under the given memory
-      */
-     public static boolean hasListener(@NonNull Key key) {
-         return LISTENERS.containsKey(key);
-@@ -35,7 +35,7 @@ public final class ChannelInitializeListenerHolder {
-     /**
-      * Registers a channel initialization listener called after ServerConnection is initialized.
-      *
--     * @param key      key
-+     * @param key      memory
-      * @param listener initialization listeners
-      */
-     public static void addListener(@NonNull Key key, @NonNull ChannelInitializeListener listener) {
-@@ -43,9 +43,9 @@ public final class ChannelInitializeListenerHolder {
-     }
- 
-     /**
--     * Removes and returns an initialization listener registered by the given key if present.
-+     * Removes and returns an initialization listener registered by the given memory if present.
-      *
--     * @param key key
-+     * @param key memory
-      * @return removed initialization listener if present
-      */
-     public static @Nullable ChannelInitializeListener removeListener(@NonNull Key key) {
-diff --git a/src/main/java/io/papermc/paper/util/PoiAccess.java b/src/main/java/io/papermc/paper/util/PoiAccess.java
-index 0a88c60161b04a733151c15046358f4b3b8b3280..8fde293f6475176b6848f767c6ad39515710c69f 100644
---- a/src/main/java/io/papermc/paper/util/PoiAccess.java
-+++ b/src/main/java/io/papermc/paper/util/PoiAccess.java
-@@ -57,7 +57,7 @@ public final class PoiAccess {
-     }
- 
- 
--    // key is:
-+    // memory is:
-     //  upper 32 bits:
-     //   upper 16 bits: max y section
-     //   lower 16 bits: min y section
-diff --git a/src/main/java/net/minecraft/advancements/DisplayInfo.java b/src/main/java/net/minecraft/advancements/DisplayInfo.java
-index 538f19f15b553d14ad95f09b1c81359f4c68b17f..b1400f60ada74236e91819bbf69bfdca46897c35 100644
---- a/src/main/java/net/minecraft/advancements/DisplayInfo.java
-+++ b/src/main/java/net/minecraft/advancements/DisplayInfo.java
-@@ -105,7 +105,7 @@ public class DisplayInfo {
- 
-     private static ItemStack getIcon(JsonObject json) {
-         if (!json.has("item")) {
--            throw new JsonSyntaxException("Unsupported icon type, currently only items are supported (add 'item' key)");
-+            throw new JsonSyntaxException("Unsupported icon type, currently only items are supported (add 'item' memory)");
-         } else {
-             Item item = GsonHelper.getAsItem(json, "item");
-             if (json.has("data")) {
-diff --git a/src/main/java/net/minecraft/core/MappedRegistry.java b/src/main/java/net/minecraft/core/MappedRegistry.java
-index 76b0b8b03c1d1c548ff67cfd6e6b127764f951d9..76d62e873ee9789277015e0b870b9a19105bfb2c 100644
---- a/src/main/java/net/minecraft/core/MappedRegistry.java
-+++ b/src/main/java/net/minecraft/core/MappedRegistry.java
-@@ -71,7 +71,7 @@ public class MappedRegistry<T> extends WritableRegistry<T> {
-         this.toId.put((T)entry, rawId);
-         this.randomCache = null;
-         if (checkDuplicateKeys && this.keyStorage.containsKey(key)) {
--            Util.logAndPauseIfInIde("Adding duplicate key '" + key + "' to registry");
-+            Util.logAndPauseIfInIde("Adding duplicate memory '" + key + "' to registry");
-         }
- 
-         if (this.storage.containsValue(entry)) {
-diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 481a5dbad82f3f8dd5b1bf8ab207d82ec73d5bbd..d26506dac0e03d085fa20cfcb137ea43e117581e 100644
---- a/src/main/java/net/minecraft/server/MinecraftServer.java
-+++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1793,7 +1793,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-         try {
-             this.keyPair = Crypt.generateKeyPair();
-         } catch (CryptException cryptographyexception) {
--            throw new IllegalStateException("Failed to generate key pair", cryptographyexception);
-+            throw new IllegalStateException("Failed to generate memory pair", cryptographyexception);
-         }
-     }
- 
-diff --git a/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-index 33a29890435d6065a2cc4f8e8bf8209c01d5d114..63a5cd049ef0e4f735cf08b44be70d20d6b412bb 100644
---- a/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-+++ b/src/main/java/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-@@ -268,7 +268,7 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener
- 
-     @Override
-     public void handleKey(ServerboundKeyPacket packet) {
--        Validate.validState(this.state == ServerLoginPacketListenerImpl.State.KEY, "Unexpected key packet", new Object[0]);
-+        Validate.validState(this.state == ServerLoginPacketListenerImpl.State.KEY, "Unexpected memory packet", new Object[0]);
-         PrivateKey privatekey = this.server.getKeyPair().getPrivate();
- 
-         final String s;
-diff --git a/src/main/java/net/minecraft/stats/ServerStatsCounter.java b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
-index ee5bb1a8edb812d48d5af45ea8485f574dcb2ad5..02dd765586c23dde24a2eb835bad7da6843cd83a 100644
---- a/src/main/java/net/minecraft/stats/ServerStatsCounter.java
-+++ b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
-@@ -137,7 +137,7 @@ public class ServerStatsCounter extends StatsCounter {
-                                                 ServerStatsCounter.LOGGER.warn("Invalid statistic in {}: Don't know what {} is", this.file, s2);
-                                             });
-                                         } else {
--                                            ServerStatsCounter.LOGGER.warn("Invalid statistic value in {}: Don't know what {} is for key {}", this.file, nbttagcompound2.get(s2), s2);
-+                                            ServerStatsCounter.LOGGER.warn("Invalid statistic value in {}: Don't know what {} is for memory {}", this.file, nbttagcompound2.get(s2), s2);
-                                         }
-                                     }
- 
-diff --git a/src/main/java/net/minecraft/world/LockCode.java b/src/main/java/net/minecraft/world/LockCode.java
-index cb63294ca9f741e8759d6947f3f36829cd693a80..e2ea0b7e6857e28ad6a6f62910188ba48b6433ca 100644
---- a/src/main/java/net/minecraft/world/LockCode.java
-+++ b/src/main/java/net/minecraft/world/LockCode.java
-@@ -25,10 +25,10 @@ public class LockCode {
-         if (this.key.isEmpty()) return true;
-         if (!stack.isEmpty() && stack.hasCustomHoverName()) {
-             if (this.key.indexOf(ChatColor.COLOR_CHAR) == -1) {
--                // The lock key contains no color codes, so let's ignore colors in the item display name (vanilla Minecraft behavior):
-+                // The lock memory contains no color codes, so let's ignore colors in the item display name (vanilla Minecraft behavior):
-                 return this.key.equals(stack.getHoverName().getString());
-             } else {
--                // The lock key contains color codes, so let's take them into account:
-+                // The lock memory contains color codes, so let's take them into account:
-                 return this.key.equals(CraftChatMessage.fromComponent(stack.getHoverName()));
-             }
-         }
 diff --git a/src/main/java/net/minecraft/world/entity/ai/behavior/Behavior.java b/src/main/java/net/minecraft/world/entity/ai/behavior/Behavior.java
 index c24ff2ef1054523e58892c2b35080cffb6ab744a..2d530de8cb463c023d42d43cfc491ea672cfe7f6 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/behavior/Behavior.java
@@ -1526,153 +847,11 @@ index f3b8e253a5bfc3f68121dbe656ae7e2ac0f0eb1c..33948d8387df1e422875a7edc24c3359
 +    }
 +    // Paper end - mob goal api
  }
-diff --git a/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java b/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
-index 9e3f9099cc47e6c6e40d11ef6d6e83fbf19a3cf7..7812f15e675430b4e3997052f32c2797acb3da60 100644
---- a/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
-+++ b/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
-@@ -201,7 +201,7 @@ public class ShapedRecipe implements CraftingRecipe {
-                 Ingredient recipeitemstack = (Ingredient) symbols.get(s);
- 
-                 if (recipeitemstack == null) {
--                    throw new JsonSyntaxException("Pattern references symbol '" + s + "' but it's not defined in the key");
-+                    throw new JsonSyntaxException("Pattern references symbol '" + s + "' but it's not defined in the memory");
-                 }
- 
-                 set.remove(s);
-@@ -319,11 +319,11 @@ public class ShapedRecipe implements CraftingRecipe {
-             Entry<String, JsonElement> entry = (Entry) iterator.next();
- 
-             if (((String) entry.getKey()).length() != 1) {
--                throw new JsonSyntaxException("Invalid key entry: '" + (String) entry.getKey() + "' is an invalid symbol (must be 1 character only).");
-+                throw new JsonSyntaxException("Invalid memory entry: '" + (String) entry.getKey() + "' is an invalid symbol (must be 1 character only).");
-             }
- 
-             if (" ".equals(entry.getKey())) {
--                throw new JsonSyntaxException("Invalid key entry: ' ' is a reserved symbol.");
-+                throw new JsonSyntaxException("Invalid memory entry: ' ' is a reserved symbol.");
-             }
- 
-             map.put((String) entry.getKey(), Ingredient.fromJson((JsonElement) entry.getValue()));
-@@ -369,7 +369,7 @@ public class ShapedRecipe implements CraftingRecipe {
-         @Override
-         public ShapedRecipe fromJson(ResourceLocation id, JsonObject json) {
-             String s = GsonHelper.getAsString(json, "group", "");
--            Map<String, Ingredient> map = ShapedRecipe.keyFromJson(GsonHelper.getAsJsonObject(json, "key"));
-+            Map<String, Ingredient> map = ShapedRecipe.keyFromJson(GsonHelper.getAsJsonObject(json, "memory"));
-             String[] astring = ShapedRecipe.shrink(ShapedRecipe.patternFromJson(GsonHelper.getAsJsonArray(json, "pattern")));
-             int i = astring[0].length();
-             int j = astring.length;
-diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-index 5aeaaae6f15050a2da271fe196d0a234ecafc8a1..4463b096f0f3086562cdee93e1ea224bc74b752b 100644
---- a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-+++ b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-@@ -58,7 +58,7 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
-     protected final ShortList[] postProcessing;
-     protected volatile boolean unsaved;
-     private volatile boolean isLightCorrect;
--    protected final ChunkPos chunkPos; public final long coordinateKey; public final int locX; public final int locZ; // Paper - cache coordinate key
-+    protected final ChunkPos chunkPos; public final long coordinateKey; public final int locX; public final int locZ; // Paper - cache coordinate memory
-     private long inhabitedTime;
-     /** @deprecated */
-     @Nullable
-@@ -125,7 +125,7 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
- 
-     public ChunkAccess(ChunkPos pos, UpgradeData upgradeData, LevelHeightAccessor heightLimitView, Registry<Biome> biome, long inhabitedTime, @Nullable LevelChunkSection[] sectionArrayInitializer, @Nullable BlendingData blendingData) {
-         this.locX = pos.x; this.locZ = pos.z; // Paper - reduce need for field lookups
--        this.chunkPos = pos; this.coordinateKey = ChunkPos.asLong(locX, locZ); // Paper - cache long key
-+        this.chunkPos = pos; this.coordinateKey = ChunkPos.asLong(locX, locZ); // Paper - cache long memory
-         this.upgradeData = upgradeData;
-         this.levelHeightAccessor = heightLimitView;
-         this.sections = new LevelChunkSection[heightLimitView.getSectionsCount()];
-diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/ChunkSerializer.java b/src/main/java/net/minecraft/world/level/chunk/storage/ChunkSerializer.java
-index 8246204ce5d8f825c7796f87006e658d7a019876..ed331ef6ce25f23870a6d2e8859d8de5c556b3cd 100644
---- a/src/main/java/net/minecraft/world/level/chunk/storage/ChunkSerializer.java
-+++ b/src/main/java/net/minecraft/world/level/chunk/storage/ChunkSerializer.java
-@@ -236,7 +236,7 @@ public class ChunkSerializer {
- 
-                 if (canReadSky) {
-                     if (sectionData.contains("SkyLight", 7)) {
--                        // we store under the same key so mod programs editing nbt
-+                        // we store under the same memory so mod programs editing nbt
-                         // can still read the data, hopefully.
-                         // however, for compatibility we store chunks as unlit so vanilla
-                         // is forced to re-light them if it encounters our data. It's too much of a burden
-@@ -580,7 +580,7 @@ public class ChunkSerializer {
-                 }
- 
-                 // Paper start
--                // we store under the same key so mod programs editing nbt
-+                // we store under the same memory so mod programs editing nbt
-                 // can still read the data, hopefully.
-                 // however, for compatibility we store chunks as unlit so vanilla
-                 // is forced to re-light them if it encounters our data. It's too much of a burden
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index ba7023e7ca5d29375ff53c2951892138d155f69f..670e9b354ab1b94801ae2d0f68ddd6cd819721c6 100644
+index ba7023e7ca5d29375ff53c2951892138d155f69f..faa0a826f7fd909b99e4d4f35dda858cc05d889f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -18,6 +18,9 @@ import com.mojang.serialization.Lifecycle;
- import io.netty.buffer.ByteBuf;
- import io.netty.buffer.ByteBufOutputStream;
- import io.netty.buffer.Unpooled;
-+import io.papermc.paper.entity.brain.memory.MemoryManager;
-+import io.papermc.paper.entity.brain.memory.MemoryModuleType;
-+import io.papermc.paper.entity.brain.memory.PaperMemoryManager;
- import io.papermc.paper.logging.SysoutCatcher;
- import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
- import java.awt.image.BufferedImage;
-@@ -199,6 +202,7 @@ import org.bukkit.craftbukkit.util.Versioning;
- import org.bukkit.craftbukkit.util.permissions.CraftDefaultPermissions;
- import org.bukkit.entity.Entity;
- import org.bukkit.entity.Player;
-+import org.bukkit.entity.memory.MemoryKey;
- import org.bukkit.event.inventory.InventoryType;
- import org.bukkit.event.player.PlayerChatTabCompleteEvent;
- import org.bukkit.event.server.BroadcastMessageEvent;
-@@ -244,6 +248,7 @@ import org.bukkit.scheduler.BukkitWorker;
- import org.bukkit.structure.StructureManager;
- import org.bukkit.util.StringUtil;
- import org.bukkit.util.permissions.DefaultPermissions;
-+import org.jetbrains.annotations.NotNull;
- import org.yaml.snakeyaml.Yaml;
- import org.yaml.snakeyaml.constructor.SafeConstructor;
- import org.yaml.snakeyaml.error.MarkedYAMLException;
-@@ -2409,7 +2414,7 @@ public final class CraftServer implements Server {
- 
-     @Override
-     public KeyedBossBar createBossBar(NamespacedKey key, String title, BarColor barColor, BarStyle barStyle, BarFlag... barFlags) {
--        Preconditions.checkArgument(key != null, "key");
-+        Preconditions.checkArgument(key != null, "memory");
- 
-         CustomBossEvent bossBattleCustom = this.getServer().getCustomBossEvents().create(CraftNamespacedKey.toMinecraft(key), CraftChatMessage.fromString(title, true)[0]);
-         CraftKeyedBossbar craftKeyedBossbar = new CraftKeyedBossbar(bossBattleCustom);
-@@ -2434,7 +2439,7 @@ public final class CraftServer implements Server {
- 
-     @Override
-     public KeyedBossBar getBossBar(NamespacedKey key) {
--        Preconditions.checkArgument(key != null, "key");
-+        Preconditions.checkArgument(key != null, "memory");
-         net.minecraft.server.bossevents.CustomBossEvent bossBattleCustom = this.getServer().getCustomBossEvents().get(CraftNamespacedKey.toMinecraft(key));
- 
-         return (bossBattleCustom == null) ? null : bossBattleCustom.getBukkitEntity();
-@@ -2442,7 +2447,7 @@ public final class CraftServer implements Server {
- 
-     @Override
-     public boolean removeBossBar(NamespacedKey key) {
--        Preconditions.checkArgument(key != null, "key");
-+        Preconditions.checkArgument(key != null, "memory");
-         net.minecraft.server.bossevents.CustomBossEvents bossBattleCustomData = this.getServer().getCustomBossEvents();
-         net.minecraft.server.bossevents.CustomBossEvent bossBattleCustom = bossBattleCustomData.get(CraftNamespacedKey.toMinecraft(key));
- 
-@@ -2470,7 +2475,7 @@ public final class CraftServer implements Server {
- 
-     @Override
-     public org.bukkit.advancement.Advancement getAdvancement(NamespacedKey key) {
--        Preconditions.checkArgument(key != null, "key");
-+        Preconditions.checkArgument(key != null, "memory");
- 
-         Advancement advancement = this.console.getAdvancements().getAdvancement(CraftNamespacedKey.toMinecraft(key));
-         return (advancement == null) ? null : advancement.bukkit;
-@@ -2815,5 +2820,34 @@ public final class CraftServer implements Server {
+@@ -2815,5 +2815,24 @@ public final class CraftServer implements Server {
          return datapackManager;
      }
  
@@ -1687,18 +866,8 @@ index ba7023e7ca5d29375ff53c2951892138d155f69f..670e9b354ab1b94801ae2d0f68ddd6cd
 +    }
 +
 +    @Override
-+    public @NotNull <U> io.papermc.paper.entity.brain.memory.MemoryModuleType<U> createMemoryModuleType(@NotNull MemoryKey<U> key) {
-+        return io.papermc.paper.entity.brain.memory.PaperMemoryModuleType.of(key);
-+    }
-+
-+    @Override
-+    public @NotNull <U> MemoryModuleType<U> createMemoryModuleType(@NotNull NamespacedKey key) {
-+        return io.papermc.paper.entity.brain.memory.PaperMemoryModuleType.of(key);
-+    }
-+
-+    @Override
-+    public MemoryManager getMemoryManager() {
-+        return PaperMemoryManager.INSTANCE;
++    public org.bukkit.entity.memory.MemoryKey<?> createMemoryKey(NamespacedKey key) {
++        return new io.papermc.paper.entity.brain.memory.PaperMemory<>(key);
 +    }
 +
 +    @Override
@@ -1732,25 +901,30 @@ index d5b31e4051f22fee4b91eb0e6be25d72e0471eff..49a22a20229ac6e4c4ebaf825814c3c3
  
  public class CraftHoglin extends CraftAnimals implements Hoglin {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-index c022751e3b45469cc0ad6732e2d6ff08918bafa4..adf88c724034dd46a49522b0ba5aa7ea9d897dca 100644
+index c022751e3b45469cc0ad6732e2d6ff08918bafa4..11983dff8a3cfcbdd8ffb164366f1ebcfafdb2fe 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-@@ -9,6 +9,7 @@ import java.util.Iterator;
- import java.util.List;
- import java.util.Set;
- import java.util.UUID;
-+
- import net.minecraft.server.level.ServerPlayer;
- import net.minecraft.world.InteractionHand;
- import net.minecraft.world.damagesource.DamageSource;
-@@ -83,6 +84,7 @@ import org.bukkit.potion.PotionType;
- import org.bukkit.util.BlockIterator;
- import org.bukkit.util.RayTraceResult;
- import org.bukkit.util.Vector;
-+import org.jetbrains.annotations.NotNull;
+@@ -784,11 +784,20 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
  
- public class CraftLivingEntity extends CraftEntity implements LivingEntity {
-     private CraftEntityEquipment equipment;
+     @Override
+     public <T> T getMemory(MemoryKey<T> memoryKey) {
++        if (memoryKey instanceof io.papermc.paper.entity.brain.memory.PaperMemory) {
++            return (T) this.getHandle().getBrain().getMemory(io.papermc.paper.entity.brain.PaperBrainUtil.getHandle(memoryKey)).orElse(null);
++        }
++
+         return (T) this.getHandle().getBrain().getMemory(CraftMemoryKey.fromMemoryKey(memoryKey)).map(CraftMemoryMapper::fromNms).orElse(null);
+     }
+ 
+     @Override
+     public <T> void setMemory(MemoryKey<T> memoryKey, T t) {
++        if (memoryKey instanceof io.papermc.paper.entity.brain.memory.PaperMemory) {
++            this.getHandle().getBrain().setMemory(io.papermc.paper.entity.brain.PaperBrainUtil.getHandle(memoryKey), t);
++            return;
++        }
++
+         this.getHandle().getBrain().setMemory(CraftMemoryKey.fromMemoryKey(memoryKey), CraftMemoryMapper.toNms(t));
+     }
+ 
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglin.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglin.java
 index aeda5fc001fe4ce55ee467240b275b6050a29f98..257637b7fbdf80427343629d12ad74076d18dc92 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglin.java
@@ -1781,173 +955,6 @@ index 611e794d86ff63d725de9bb843802ec868f4b1fd..eb15a997fa855f90bab7eb159ac2342f
  import org.bukkit.entity.Zoglin;
  
  public class CraftZoglin extends CraftMonster implements Zoglin {
-diff --git a/src/main/java/org/bukkit/craftbukkit/help/SimpleHelpMap.java b/src/main/java/org/bukkit/craftbukkit/help/SimpleHelpMap.java
-index 40b66adcb5aac64212b1937dc506ebb60f2eed83..712cb28a50fa811c5ed86c9a9c20c99ef5c99105 100644
---- a/src/main/java/org/bukkit/craftbukkit/help/SimpleHelpMap.java
-+++ b/src/main/java/org/bukkit/craftbukkit/help/SimpleHelpMap.java
-@@ -39,7 +39,7 @@ public class SimpleHelpMap implements HelpMap {
- 
-     @SuppressWarnings("unchecked")
-     public SimpleHelpMap(CraftServer server) {
--        this.helpTopics = new TreeMap<String, HelpTopic>(HelpTopicComparator.topicNameComparatorInstance()); // Using a TreeMap for its explicit sorting on key
-+        this.helpTopics = new TreeMap<String, HelpTopic>(HelpTopicComparator.topicNameComparatorInstance()); // Using a TreeMap for its explicit sorting on memory
-         this.topicFactoryMap = new HashMap<Class, HelpTopicFactory<Command>>();
-         this.server = server;
-         this.yaml = new HelpYamlReader(server);
-diff --git a/src/main/java/org/bukkit/craftbukkit/metadata/BlockMetadataStore.java b/src/main/java/org/bukkit/craftbukkit/metadata/BlockMetadataStore.java
-index 13e20ef854361b223ae349f96b9493fe7cfcfbf7..0e2710aee33a71653061678dfeda97d2157d75d3 100644
---- a/src/main/java/org/bukkit/craftbukkit/metadata/BlockMetadataStore.java
-+++ b/src/main/java/org/bukkit/craftbukkit/metadata/BlockMetadataStore.java
-@@ -24,10 +24,10 @@ public class BlockMetadataStore extends MetadataStoreBase<Block> implements Meta
-     }
- 
-     /**
--     * Generates a unique metadata key for a {@link Block} object based on its coordinates in the world.
-+     * Generates a unique metadata memory for a {@link Block} object based on its coordinates in the world.
-      * @param block the block
-      * @param metadataKey The name identifying the metadata value
--     * @return a unique metadata key
-+     * @return a unique metadata memory
-      * @see MetadataStoreBase#disambiguate(Object, String)
-      */
-     @Override
-diff --git a/src/main/java/org/bukkit/craftbukkit/metadata/EntityMetadataStore.java b/src/main/java/org/bukkit/craftbukkit/metadata/EntityMetadataStore.java
-index f475ade1b015339de2b81d5fe7c7324fecd3b875..9bcb32a486de7150f28bd11a1c54e36ac45efd9d 100644
---- a/src/main/java/org/bukkit/craftbukkit/metadata/EntityMetadataStore.java
-+++ b/src/main/java/org/bukkit/craftbukkit/metadata/EntityMetadataStore.java
-@@ -9,11 +9,11 @@ import org.bukkit.metadata.MetadataStoreBase;
-  */
- public class EntityMetadataStore extends MetadataStoreBase<Entity> implements MetadataStore<Entity> {
-     /**
--     * Generates a unique metadata key for an {@link Entity} UUID.
-+     * Generates a unique metadata memory for an {@link Entity} UUID.
-      *
-      * @param entity the entity
-      * @param metadataKey The name identifying the metadata value
--     * @return a unique metadata key
-+     * @return a unique metadata memory
-      * @see MetadataStoreBase#disambiguate(Object, String)
-      */
-     @Override
-diff --git a/src/main/java/org/bukkit/craftbukkit/metadata/PlayerMetadataStore.java b/src/main/java/org/bukkit/craftbukkit/metadata/PlayerMetadataStore.java
-index 554e81bab6a35feb4c1c9cba4b15afed2e814fda..0b725433d8bc1af4ae0ae06a0ec3c6cf9d7f0267 100644
---- a/src/main/java/org/bukkit/craftbukkit/metadata/PlayerMetadataStore.java
-+++ b/src/main/java/org/bukkit/craftbukkit/metadata/PlayerMetadataStore.java
-@@ -9,11 +9,11 @@ import org.bukkit.metadata.MetadataStoreBase;
-  */
- public class PlayerMetadataStore extends MetadataStoreBase<OfflinePlayer> implements MetadataStore<OfflinePlayer> {
-     /**
--     * Generates a unique metadata key for {@link org.bukkit.entity.Player} and {@link OfflinePlayer} using the player
-+     * Generates a unique metadata memory for {@link org.bukkit.entity.Player} and {@link OfflinePlayer} using the player
-      * UUID.
-      * @param player the player
-      * @param metadataKey The name identifying the metadata value
--     * @return a unique metadata key
-+     * @return a unique metadata memory
-      * @see MetadataStoreBase#disambiguate(Object, String)
-      */
-     @Override
-diff --git a/src/main/java/org/bukkit/craftbukkit/metadata/WorldMetadataStore.java b/src/main/java/org/bukkit/craftbukkit/metadata/WorldMetadataStore.java
-index 02996286ad09c36355747685a0b8170a56262c3b..1b8b02e7e1a2a5476a942df3ec55b4770a25ab69 100644
---- a/src/main/java/org/bukkit/craftbukkit/metadata/WorldMetadataStore.java
-+++ b/src/main/java/org/bukkit/craftbukkit/metadata/WorldMetadataStore.java
-@@ -9,10 +9,10 @@ import org.bukkit.metadata.MetadataStoreBase;
-  */
- public class WorldMetadataStore extends MetadataStoreBase<World> implements MetadataStore<World> {
-     /**
--     * Generates a unique metadata key for a {@link World} object based on the world UID.
-+     * Generates a unique metadata memory for a {@link World} object based on the world UID.
-      * @param world the world
-      * @param metadataKey The name identifying the metadata value
--     * @return a unique metadata key
-+     * @return a unique metadata memory
-      * @see WorldMetadataStore#disambiguate(Object, String)
-      */
-     @Override
-diff --git a/src/main/java/org/bukkit/craftbukkit/persistence/CraftPersistentDataContainer.java b/src/main/java/org/bukkit/craftbukkit/persistence/CraftPersistentDataContainer.java
-index 2c59f09a9261a1690951161fd856a5848d9885b7..94708f7e017f6d53d26498e44ed083b113ee161f 100644
---- a/src/main/java/org/bukkit/craftbukkit/persistence/CraftPersistentDataContainer.java
-+++ b/src/main/java/org/bukkit/craftbukkit/persistence/CraftPersistentDataContainer.java
-@@ -34,7 +34,7 @@ public class CraftPersistentDataContainer implements PersistentDataContainer {
- 
-     @Override
-     public <T, Z> void set(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
--        Validate.notNull(key, "The provided key for the custom value was null");
-+        Validate.notNull(key, "The provided memory for the custom value was null");
-         Validate.notNull(type, "The provided type for the custom value was null");
-         Validate.notNull(value, "The provided value for the custom value was null");
- 
-@@ -43,7 +43,7 @@ public class CraftPersistentDataContainer implements PersistentDataContainer {
- 
-     @Override
-     public <T, Z> boolean has(NamespacedKey key, PersistentDataType<T, Z> type) {
--        Validate.notNull(key, "The provided key for the custom value was null");
-+        Validate.notNull(key, "The provided memory for the custom value was null");
-         Validate.notNull(type, "The provided type for the custom value was null");
- 
-         Tag value = this.customDataTags.get(key.toString());
-@@ -56,7 +56,7 @@ public class CraftPersistentDataContainer implements PersistentDataContainer {
- 
-     @Override
-     public <T, Z> Z get(NamespacedKey key, PersistentDataType<T, Z> type) {
--        Validate.notNull(key, "The provided key for the custom value was null");
-+        Validate.notNull(key, "The provided memory for the custom value was null");
-         Validate.notNull(type, "The provided type for the custom value was null");
- 
-         Tag value = this.customDataTags.get(key.toString());
-@@ -89,7 +89,7 @@ public class CraftPersistentDataContainer implements PersistentDataContainer {
- 
-     @Override
-     public void remove(NamespacedKey key) {
--        Validate.notNull(key, "The provided key for the custom value was null");
-+        Validate.notNull(key, "The provided memory for the custom value was null");
- 
-         this.customDataTags.remove(key.toString());
-     }
-diff --git a/src/main/java/org/bukkit/craftbukkit/structure/CraftStructureManager.java b/src/main/java/org/bukkit/craftbukkit/structure/CraftStructureManager.java
-index c72f79706321b0445ffecde1cfdb03301b2c6579..b44e86db8fae956c9f923fecb5403fafaf505ca9 100644
---- a/src/main/java/org/bukkit/craftbukkit/structure/CraftStructureManager.java
-+++ b/src/main/java/org/bukkit/craftbukkit/structure/CraftStructureManager.java
-@@ -172,7 +172,7 @@ public class CraftStructureManager implements StructureManager {
- 
-         ResourceLocation minecraftkey = CraftNamespacedKey.toMinecraft(structureKey);
-         if (minecraftkey.getPath().contains("//")) {
--            throw new IllegalArgumentException("Resource key for Structures can not contain \"//\"");
-+            throw new IllegalArgumentException("Resource memory for Structures can not contain \"//\"");
-         }
-         return minecraftkey;
-     }
-diff --git a/src/main/java/org/spigotmc/Metrics.java b/src/main/java/org/spigotmc/Metrics.java
-index 8f15af52d2ed734732134bf011ccdd4b7856a284..ac8a8639024e317a59ff3b46f3346f9318da0ca8 100644
---- a/src/main/java/org/spigotmc/Metrics.java
-+++ b/src/main/java/org/spigotmc/Metrics.java
-@@ -391,7 +391,7 @@ public class Metrics {
-                 final Graph graph = iter.next();
- 
-                 for (Plotter plotter : graph.getPlotters()) {
--                    // The key name to send to the metrics server
-+                    // The memory name to send to the metrics server
-                     // The format is C-GRAPHNAME-PLOTTERNAME where separator - is defined at the top
-                     // Legacy (R4) submitters use the format Custom%s, or CustomPLOTTERNAME
-                     final String key = String.format("C%s%s%s%s", CUSTOM_DATA_SEPARATOR, graph.getName(), CUSTOM_DATA_SEPARATOR, plotter.getColumnName());
-@@ -470,7 +470,7 @@ public class Metrics {
-     }
- 
-     /**
--     * <p>Encode a key/value data pair to be used in a HTTP post request. This INCLUDES a & so the first key/value pair
-+     * <p>Encode a memory/value data pair to be used in a HTTP post request. This INCLUDES a & so the first memory/value pair
-      * MUST be included manually, e.g:</p>
-      * <code>
-      * StringBuffer data = new StringBuffer();
-@@ -479,7 +479,7 @@ public class Metrics {
-      * </code>
-      *
-      * @param buffer the stringbuilder to append the data pair onto
--     * @param key the key value
-+     * @param key the memory value
-      * @param value the value
-      */
-     private static void encodeDataPair(final StringBuilder buffer, final String key, final String value) throws UnsupportedEncodingException {
 diff --git a/src/test/java/io/papermc/paper/entity/brain/MissingBrainAPITest.java b/src/test/java/io/papermc/paper/entity/brain/MissingBrainAPITest.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..99e68796afbd0b121adb55bb1a7580b3252f2ef3
@@ -2011,41 +1018,3 @@ index 0000000000000000000000000000000000000000..99e68796afbd0b121adb55bb1a7580b3
 +    }
 +
 +}
-diff --git a/src/test/java/io/papermc/paper/world/TranslationKeyTest.java b/src/test/java/io/papermc/paper/world/TranslationKeyTest.java
-index b2e73df86683b88c83349b6d13456f5b051ac5d5..f0ddc3e7b7bb084b390576177cda159b78f75e19 100644
---- a/src/test/java/io/papermc/paper/world/TranslationKeyTest.java
-+++ b/src/test/java/io/papermc/paper/world/TranslationKeyTest.java
-@@ -13,14 +13,14 @@ public class TranslationKeyTest extends org.bukkit.support.AbstractTestingBase {
-     public void testChatVisibilityKeys() {
-         for (ClientOption.ChatVisibility chatVisibility : ClientOption.ChatVisibility.values()) {
-             if (chatVisibility == ClientOption.ChatVisibility.UNKNOWN) continue;
--            Assert.assertEquals(chatVisibility + "'s translation key doesn't match", ChatVisiblity.valueOf(chatVisibility.name()).getKey(), chatVisibility.translationKey());
-+            Assert.assertEquals(chatVisibility + "'s translation memory doesn't match", ChatVisiblity.valueOf(chatVisibility.name()).getKey(), chatVisibility.translationKey());
-         }
-     }
- 
-     @Test
-     public void testDifficultyKeys() {
-         for (Difficulty bukkitDifficulty : Difficulty.values()) {
--            Assert.assertEquals(bukkitDifficulty + "'s translation key doesn't match", ((TranslatableComponent) net.minecraft.world.Difficulty.byId(bukkitDifficulty.ordinal()).getDisplayName()).getKey(), bukkitDifficulty.translationKey());
-+            Assert.assertEquals(bukkitDifficulty + "'s translation memory doesn't match", ((TranslatableComponent) net.minecraft.world.Difficulty.byId(bukkitDifficulty.ordinal()).getDisplayName()).getKey(), bukkitDifficulty.translationKey());
-         }
-     }
- 
-@@ -34,14 +34,14 @@ public class TranslationKeyTest extends org.bukkit.support.AbstractTestingBase {
-     @Test
-     public void testAttributeKeys() {
-         for (org.bukkit.attribute.Attribute attribute : org.bukkit.attribute.Attribute.values()) {
--            Assert.assertEquals("translation key mismatch for " + attribute, org.bukkit.craftbukkit.attribute.CraftAttributeMap.toMinecraft(attribute).getDescriptionId(), attribute.translationKey());
-+            Assert.assertEquals("translation memory mismatch for " + attribute, org.bukkit.craftbukkit.attribute.CraftAttributeMap.toMinecraft(attribute).getDescriptionId(), attribute.translationKey());
-         }
-     }
- 
-     @Test
-     public void testFireworkEffectType() {
-         for (org.bukkit.FireworkEffect.Type type : org.bukkit.FireworkEffect.Type.values()) {
--            Assert.assertEquals("translation key mismatch for " + type, net.minecraft.world.item.FireworkRocketItem.Shape.byId(org.bukkit.craftbukkit.inventory.CraftMetaFirework.getNBT(type)).getName(), org.bukkit.FireworkEffect.Type.NAMES.key(type));
-+            Assert.assertEquals("translation memory mismatch for " + type, net.minecraft.world.item.FireworkRocketItem.Shape.byId(org.bukkit.craftbukkit.inventory.CraftMetaFirework.getNBT(type)).getName(), org.bukkit.FireworkEffect.Type.NAMES.key(type));
-         }
-     }
- }

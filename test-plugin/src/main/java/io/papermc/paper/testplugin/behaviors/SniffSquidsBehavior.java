@@ -5,15 +5,12 @@ import io.papermc.paper.entity.brain.memory.MemoryKeyStatus;
 import io.papermc.paper.entity.brain.memory.MemoryPair;
 import io.papermc.paper.testplugin.TestPlugin;
 import net.kyori.adventure.sound.Sound;
-import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Squid;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public class SniffSquidsBehavior implements Behavior<Mob> {
 
@@ -24,13 +21,10 @@ public class SniffSquidsBehavior implements Behavior<Mob> {
 
     @Override
     public void tick(Mob entity) {
-        //TODO empty optional.
-        Bukkit.getMemoryManager().getMemory(entity, TestPlugin.SQUID_CANDIDATES).ifPresent(squids -> {
-            System.out.println();
-            for (Squid squid : squids) {
-                entity.lookAt(squid);
-            }
-        });
+        List<Squid> squids = entity.getMemory(TestPlugin.SQUID_CANDIDATES);
+        for (Squid squid : squids) {
+            entity.lookAt(squid);
+        }
 
         entity.getWorld().spawnParticle(Particle.HEART, entity.getEyeLocation(), 1);
     }
