@@ -1,6 +1,6 @@
-package io.papermc.paper.testplugin.behaviors;
+package io.papermc.paper.testplugin.behaviors.squid;
 
-import io.papermc.paper.entity.brain.BrainManager;
+import io.papermc.paper.entity.brain.BrainHolder;
 import io.papermc.paper.entity.brain.activity.behavior.Behavior;
 import io.papermc.paper.entity.brain.memory.MemoryKeyStatus;
 import io.papermc.paper.entity.brain.memory.MemoryPair;
@@ -26,10 +26,11 @@ public class HuntSquidsBehavior implements Behavior<Mob> {
     public void tick(Mob entity) {
         List<Squid> squids = entity.getMemory(TestPlugin.SQUID_CANDIDATES);
         if (target == null || target.isDead()) {
-            BrainManager manager = Bukkit.getBrainManager();
             if (squids.isEmpty()) {
-                manager.forgetMemory(entity, TestPlugin.SQUID_CANDIDATES);
-                manager.forgetMemory(entity, TestPlugin.SQUID_RAGE);
+                if (entity instanceof BrainHolder<?> holder) {
+                    holder.forgetMemory(TestPlugin.SQUID_CANDIDATES);
+                    holder.forgetMemory(TestPlugin.SQUID_RAGE);
+                }
                 return;
             }
 

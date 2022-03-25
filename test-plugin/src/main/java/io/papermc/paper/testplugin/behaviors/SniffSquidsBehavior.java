@@ -12,6 +12,9 @@ import org.bukkit.entity.Squid;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * When the goat isn't angry, it will sometimes want to sniff the nearby squids.
+ */
 public class SniffSquidsBehavior implements Behavior<Mob> {
 
     @Override
@@ -46,6 +49,6 @@ public class SniffSquidsBehavior implements Behavior<Mob> {
 
     @Override
     public Collection<MemoryPair> getMemoryRequirements() {
-        return List.of(new MemoryPair(MemoryKeyStatus.PRESENT, TestPlugin.SQUID_CANDIDATES)); // Only sniff squids when there are none
+        return List.of(new MemoryPair(MemoryKeyStatus.PRESENT, TestPlugin.SQUID_CANDIDATES), new MemoryPair(MemoryKeyStatus.ABSENT, TestPlugin.SQUID_RAGE));
     }
 }
