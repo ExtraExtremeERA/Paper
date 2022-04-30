@@ -102,15 +102,15 @@ index 0000000000000000000000000000000000000000..cb6d93526b637946aec311bef103ad30
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index a14a032c338bb837b3000232f6a32dc5bfe3f01d..5dc245bfbc1d466ab96294bbc10ead1fcec4f841 100644
+index a14a032c338bb837b3000232f6a32dc5bfe3f01d..74d9841e70f0cd56015b1492d2325ea0fb5e5c72 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
 @@ -2355,6 +2355,15 @@ public final class Bukkit {
      public static io.papermc.paper.datapack.DatapackManager getDatapackManager() {
          return server.getDatapackManager();
      }
-+
-+    /**
++    
++    /**  
 +     * Gets the potion brewer.
 +     *
 +     * @return the potion brewer

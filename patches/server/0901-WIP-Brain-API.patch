@@ -866,13 +866,14 @@ index f3b8e253a5bfc3f68121dbe656ae7e2ac0f0eb1c..33948d8387df1e422875a7edc24c3359
 +    // Paper end - mob goal api
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index ba7023e7ca5d29375ff53c2951892138d155f69f..ff79a9205db5da1eaa7c5130ac629038a197b17c 100644
+index 541693c90648491591bfd32d3298faafd91e90e3..d9df54453add3cd5d0fcd76491c48f9e21e4a3ef 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -2815,5 +2815,19 @@ public final class CraftServer implements Server {
-         return datapackManager;
+@@ -2871,5 +2871,20 @@ public final class CraftServer implements Server {
+     public CraftPotionBrewer getPotionBrewer() {
+         return this.potionBrewer;
      }
- 
++
 +    @Override
 +    public io.papermc.paper.entity.brain.activity.ActivityKey createActivityKey(NamespacedKey key) {
 +        return io.papermc.paper.entity.brain.PaperBrainUtil.registerCustomActivityKey(key);
@@ -960,7 +961,7 @@ index c022751e3b45469cc0ad6732e2d6ff08918bafa4..f017d63d404262dc975baeb55fca3c5e
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglin.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglin.java
-index aeda5fc001fe4ce55ee467240b275b6050a29f98..34753336dbd1aa5acc2438a0d502d623c85faefa 100644
+index 48d0a4e42e1b90d1323784d1284acabfe9497dd6..fc38f788bd1f0b07420f039e865b4ff28dcb965d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglin.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPiglin.java
 @@ -13,7 +13,7 @@ import org.bukkit.entity.EntityType;
@@ -986,7 +987,7 @@ index 689c4ce62f604d023e2f293db17f423fd10acbaf..48fb65275919bd8c180b6086ebbff1e6
      public CraftPiglinBrute(CraftServer server, net.minecraft.world.entity.monster.piglin.PiglinBrute entity) {
          super(server, entity);
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
-index dbc1ea96223675fbe03585598a9c7f51acc61d2e..634c8b42f8d7c4fc1654e4e1187b101897fa1386 100644
+index 6de6553e79c9729ef49e2a544730b1ac1020dff2..706dd7a77a18ecb359458a7edc6b06195d23d9c8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftVillager.java
 @@ -23,7 +23,7 @@ import java.util.Map;

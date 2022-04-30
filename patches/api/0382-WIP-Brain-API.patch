@@ -5,10 +5,10 @@ Subject: [PATCH] WIP Brain API
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index a23b2bd8e1ca1ff8d0ad5ed5d5e41c89e4795090..c113d28663d55b8b200e0cbf6623f27778ef8927 100644
+index 01798255d45f2a642df00156f11dd2bcd8108079..5436ecea740fdfbd6533015f857bfb21c9718634 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -43,6 +43,7 @@ dependencies {
+@@ -44,6 +44,7 @@ dependencies {
  
      implementation("org.ow2.asm:asm:9.2")
      implementation("org.ow2.asm:asm-commons:9.2")
@@ -622,12 +622,12 @@ index 0000000000000000000000000000000000000000..9128b85dd8a68ea9b5d32adbd464e5c0
 +
 +}
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 53c4e5ca208ee17c7c244e416c537c7b63edf194..fda5607a906c81e9a47bff720606bd94fa55fd49 100644
+index 74d9841e70f0cd56015b1492d2325ea0fb5e5c72..1d4200fbf08e6a402aedd6843146a6c40cef7af3 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -2175,6 +2175,42 @@ public final class Bukkit {
-     public static io.papermc.paper.datapack.DatapackManager getDatapackManager() {
-         return server.getDatapackManager();
+@@ -2364,6 +2364,42 @@ public final class Bukkit {
+     public static @NotNull org.bukkit.potion.PotionBrewer getPotionBrewer() {
+         return server.getPotionBrewer();
      }
 +
 +    /**
@@ -669,13 +669,13 @@ index 53c4e5ca208ee17c7c244e416c537c7b63edf194..fda5607a906c81e9a47bff720606bd94
  
      @NotNull
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index e48af3822e9f118399c3a1c9358c56efae12e0da..8699859e2362f69d08fc07dcb72c48bed39fc5ce 100644
+index 0eda17c8642aa49c2f57c409c3bd3234948feae9..1dd56324de8031f242c02fb07907c0bf346d0a4f 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -1887,5 +1887,38 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -2059,5 +2059,38 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+      * @return the potion brewer
       */
-     @NotNull
-     io.papermc.paper.datapack.DatapackManager getDatapackManager();
+     @NotNull org.bukkit.potion.PotionBrewer getPotionBrewer();
 +
 +    /**
 +     * Creates a custom activity key used in the mob brain api
@@ -751,7 +751,7 @@ index b49670816d0d42aee08614d9a59a1f785ad8e6bc..fb966976fd5baa8d29784c12fab491e1
      /**
       * Gets whether the hoglin is immune to zombification.
 diff --git a/src/main/java/org/bukkit/entity/Piglin.java b/src/main/java/org/bukkit/entity/Piglin.java
-index 6fdc0e0bb62189dbf3cf9ce7a87b7fbb995956a3..681603dd354203bbbd567f2310997233180a6f0b 100644
+index d4cb4b0ed1d9766a87867dcf1a3a839526ba9332..09092216d332843627d40c1101ea22cb8e712e53 100644
 --- a/src/main/java/org/bukkit/entity/Piglin.java
 +++ b/src/main/java/org/bukkit/entity/Piglin.java
 @@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
@@ -774,10 +774,10 @@ index e230c17524cd25939c7f85f3ecd7aa43cd20fdf8..22c0ed1acc89415c09340fc48e8ff94e
 -public interface PiglinBrute extends PiglinAbstract { }
 +public interface PiglinBrute extends PiglinAbstract, io.papermc.paper.entity.brain.BrainHolder<PiglinBrute> { } // Paper - Brain API
 diff --git a/src/main/java/org/bukkit/entity/Villager.java b/src/main/java/org/bukkit/entity/Villager.java
-index 02ecc87a90bbd81e7d21279fac701ba41c74fd9f..ee7abc7e06be95e8e1605bbb9439e3843dbe6bee 100644
+index d61855b83da0776fe910dee8cde184c720571a71..ceaa04ca1718cfc6506980de36b0aeec9ab1e707 100644
 --- a/src/main/java/org/bukkit/entity/Villager.java
 +++ b/src/main/java/org/bukkit/entity/Villager.java
-@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable; // Paper
+@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
  /**
   * Represents a villager NPC
   */
