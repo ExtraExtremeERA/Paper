@@ -9,7 +9,7 @@ pluginManagement {
 
 rootProject.name = "paper"
 
-for (name in listOf("Paper-API", "Paper-Server", "Paper-MojangAPI")) {
+for (name in listOf("Paper-API", "Paper-Server", "Paper-MojangAPI", "Paper-PreServerAPI")) {
     val projName = name.toLowerCase(Locale.ENGLISH)
     include(projName)
     findProject(":$projName")!!.projectDir = file(name)
