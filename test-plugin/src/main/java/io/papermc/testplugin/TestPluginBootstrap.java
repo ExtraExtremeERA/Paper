@@ -1,8 +1,8 @@
 package io.papermc.testplugin;
 
+import io.papermc.paper.PreServerAPI;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrapContext;
-import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryDebugging;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -22,10 +22,11 @@ public class TestPluginBootstrap implements PluginBootstrap {
         logger.log(Level.INFO, "Bukkit.getServer() is null since the server doesn't exist yet!");
 
         logger.log(Level.SEVERE, "Cool initializer error for showing stacktrace only.", new AssertionError());
-        RegistryAccess.getInstance();
-        RegistryDebugging.INSTANCE.debugAddChatType();
-        RegistryDebugging.INSTANCE.debugAddDimension();
-        RegistryDebugging.INSTANCE.debugAddMemory();
+
+        final RegistryDebugging registryDebugging = PreServerAPI.game().registryDebugging();
+        registryDebugging.debugAddChatType();
+        registryDebugging.debugAddDimension();
+        registryDebugging.debugAddMemory();
 
         this.secret = "HI";
     }

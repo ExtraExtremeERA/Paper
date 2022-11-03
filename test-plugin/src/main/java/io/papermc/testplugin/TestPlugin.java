@@ -1,5 +1,6 @@
 package io.papermc.testplugin;
 
+import io.papermc.paper.PreServerAPI;
 import io.papermc.paper.registry.RegistryDebugging;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -36,6 +37,6 @@ public final class TestPlugin extends JavaPlugin implements Listener {
             e.printStackTrace();
         }
 
-        RegistryDebugging.INSTANCE.finallyDebug();
+        PreServerAPI.game().registryDebugging().finallyDebug();
     }
 }
