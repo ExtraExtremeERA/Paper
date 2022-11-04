@@ -1,5 +1,6 @@
 package io.papermc.paper.plugin.bootstrap;
 
+import io.papermc.paper.Game;
 import io.papermc.paper.plugin.configuration.PluginConfiguration;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,9 @@ import java.util.logging.Logger;
  */
 @ApiStatus.NonExtendable
 public interface PluginBootstrapContext {
+
+    @NotNull
+    Game getGame();
 
     /**
      * Gets the plugin's configuration.

@@ -41,10 +41,10 @@ index 44e0f265432487fe5c3c00c5245041298ade16a0..cef1cd4e0d8b78a5e237227309eec36a
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
 diff --git a/src/main/java/io/papermc/paper/GameImpl.java b/src/main/java/io/papermc/paper/GameImpl.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a232d4a0ee59d8833ad1632564cabe1804f5c059
+index 0000000000000000000000000000000000000000..bc4aee97202fbb66c44180af3af92baf6b89f807
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/GameImpl.java
-@@ -0,0 +1,51 @@
+@@ -0,0 +1,53 @@
 +package io.papermc.paper;
 +
 +import io.papermc.paper.plugin.PluginSystem;
@@ -59,11 +59,13 @@ index 0000000000000000000000000000000000000000..a232d4a0ee59d8833ad1632564cabe18
 +import java.util.Optional;
 +
 +public final class GameImpl implements Game {
++    private static GameImpl game;
++
 +    private final PluginSystemImpl pluginSystem;
 +    private final RegistryDebuggingImpl registryDebugging;
 +
 +    private GameImpl(@NotNull final OptionSet minecraftOptionSet) {
-+        PreServerAPI.game = this;
++        GameImpl.game = this;
 +
 +        this.pluginSystem = new PluginSystemImpl(minecraftOptionSet);
 +        this.registryDebugging = new RegistryDebuggingImpl();
@@ -78,7 +80,7 @@ index 0000000000000000000000000000000000000000..a232d4a0ee59d8833ad1632564cabe18
 +     *  Exists only for a utility internal usage.
 +     */
 +    public static GameImpl instance() {
-+        return (GameImpl) PreServerAPI.game;
++        return GameImpl.game;
 +    }
 +
 +    @Override
@@ -402,12 +404,14 @@ index 0000000000000000000000000000000000000000..63f0a0987734056e47077e9a95815544
 +}
 diff --git a/src/main/java/io/papermc/paper/plugin/bootstrap/PluginBootstrapContextImpl.java b/src/main/java/io/papermc/paper/plugin/bootstrap/PluginBootstrapContextImpl.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..cea81ae7c829f940c90f41e0bbb73bb96cdd3602
+index 0000000000000000000000000000000000000000..c10eacfd4eb01d0a5cd8e864663e40186ce7f0ff
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/plugin/bootstrap/PluginBootstrapContextImpl.java
-@@ -0,0 +1,38 @@
+@@ -0,0 +1,45 @@
 +package io.papermc.paper.plugin.bootstrap;
 +
++import io.papermc.paper.Game;
++import io.papermc.paper.GameImpl;
 +import io.papermc.paper.plugin.configuration.PluginConfiguration;
 +import io.papermc.paper.plugin.provider.PluginProvider;
 +import org.jetbrains.annotations.NotNull;
@@ -422,6 +426,11 @@ index 0000000000000000000000000000000000000000..cea81ae7c829f940c90f41e0bbb73bb9
 +        Path dataFolder = pluginFolder.resolve(provider.getConfiguration().getDisplayName());
 +
 +        return new PluginBootstrapContextImpl(provider, dataFolder);
++    }
++
++    @Override
++    public @NotNull Game getGame() {
++        return GameImpl.instance();
 +    }
 +
 +    @Override

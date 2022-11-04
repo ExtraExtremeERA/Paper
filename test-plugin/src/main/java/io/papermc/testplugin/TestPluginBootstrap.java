@@ -1,6 +1,5 @@
 package io.papermc.testplugin;
 
-import io.papermc.paper.PreServerAPI;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrapContext;
 import io.papermc.paper.registry.RegistryDebugging;
@@ -13,6 +12,7 @@ import java.util.logging.Logger;
 public class TestPluginBootstrap implements PluginBootstrap {
 
     public String secret;
+    public RegistryDebugging registryDebugging;
 
     @Override
     public void bootstrap(@NotNull PluginBootstrapContext context) {
@@ -23,7 +23,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
 
         logger.log(Level.SEVERE, "Cool initializer error for showing stacktrace only.", new AssertionError());
 
-        final RegistryDebugging registryDebugging = PreServerAPI.game().registryDebugging();
+        this.registryDebugging = context.getGame().registryDebugging();
         registryDebugging.debugAddChatType();
         registryDebugging.debugAddDimension();
         registryDebugging.debugAddMemory();
@@ -33,6 +33,6 @@ public class TestPluginBootstrap implements PluginBootstrap {
 
     @Override
     public @NotNull JavaPlugin createPlugin(@NotNull PluginBootstrapContext context) {
-        return new TestPlugin(this.secret);
+        return new TestPlugin(this.secret, this.registryDebugging);
     }
 }

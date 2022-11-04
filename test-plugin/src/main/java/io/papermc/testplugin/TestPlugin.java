@@ -1,6 +1,5 @@
 package io.papermc.testplugin;
 
-import io.papermc.paper.PreServerAPI;
 import io.papermc.paper.registry.RegistryDebugging;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -12,9 +11,11 @@ import java.util.logging.Level;
 public final class TestPlugin extends JavaPlugin implements Listener {
 
     private final String key;
+    private final RegistryDebugging registryDebugging;
 
-    public TestPlugin(String key) {
+    public TestPlugin(String key, RegistryDebugging debugging) {
         this.key = key;
+        this.registryDebugging = debugging;
     }
 
     @Override
@@ -37,6 +38,6 @@ public final class TestPlugin extends JavaPlugin implements Listener {
             e.printStackTrace();
         }
 
-        PreServerAPI.game().registryDebugging().finallyDebug();
+        this.registryDebugging.finallyDebug();
     }
 }
